@@ -40,6 +40,11 @@ import com.google.home.matter.standard.OnOffLightDevice
 import com.google.home.matter.standard.OnOffLightSwitchDevice
 import com.google.home.matter.standard.OnOffPluginUnitDevice
 import com.google.home.matter.standard.OnOffSensorDevice
+import com.google.home.matter.standard.TemperatureControl
+import com.google.home.matter.standard.TemperatureMeasurement
+import com.google.home.matter.standard.Thermostat
+import com.google.home.matter.standard.ThermostatDevice
+import com.google.home.matter.standard.ThermostatTrait
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
@@ -64,7 +69,7 @@ class HomeApp(val context: Context, val scope: CoroutineScope, val activity : Co
         )
 
         // Initialize the HomeClient, which is the primary object to use all Home APIs:
-        homeClient = Home.getClient(context = context, homeConfig = config)
+        homeClient = HomeClientProvider.getClient(context = context, homeConfig = config)
 
         // Initialize supporting classes for Permissions and Commissioning APIs:
         permissionsManager = PermissionsManager(context, scope, activity, homeClient)
@@ -84,6 +89,7 @@ class HomeApp(val context: Context, val scope: CoroutineScope, val activity : Co
             OnOffSensorDevice,
             ContactSensorDevice,
             OccupancySensorDevice,
+            ThermostatDevice,
         )
 
         // List of supported device traits by this app:
@@ -92,6 +98,9 @@ class HomeApp(val context: Context, val scope: CoroutineScope, val activity : Co
             LevelControl,
             BooleanState,
             OccupancySensing,
+            Thermostat,
+            TemperatureControl,
+            TemperatureMeasurement,
         )
     }
 }

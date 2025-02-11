@@ -61,6 +61,8 @@ import com.google.home.matter.standard.LevelControl
 import com.google.home.matter.standard.OccupancySensing
 import com.google.home.matter.standard.OccupancySensingTrait
 import com.google.home.matter.standard.OnOff
+import com.google.home.matter.standard.Thermostat
+import com.google.home.matter.standard.ThermostatTrait
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -92,12 +94,15 @@ fun StarterView (homeAppVM: HomeAppViewModel) {
         mutableStateOf(starterVM.valueBooleanState.value) }
     val starterValueOccupancy: MutableState<OccupancySensingTrait.OccupancyBitmap?> = remember {
         mutableStateOf(starterVM.valueOccupancy.value) }
+    val starterValueThermostat: MutableState<ThermostatTrait.SystemModeEnum?> = remember {
+        mutableStateOf(starterVM.valueThermostat.value) }
     // Variables to track UI state for dropdown views:
     var expandedDeviceSelection: Boolean by remember { mutableStateOf(false) }
     var expandedTraitSelection: Boolean by remember { mutableStateOf(false) }
     var expandedOperationSelection: Boolean by remember { mutableStateOf(false) }
     var expandedBooleanSelection: Boolean by remember { mutableStateOf(false) }
     var expandedOccupancySelection: Boolean by remember { mutableStateOf(false) }
+    var expandedThermostatSelection: Boolean by remember { mutableStateOf(false) }
 
     // Back action for closing view:
     BackHandler {
@@ -233,7 +238,8 @@ fun StarterView (homeAppVM: HomeAppViewModel) {
                 }
                 LevelControl -> {
                     Box (Modifier.padding(horizontal = 24.dp, vertical = 8.dp)) {
-                        LevelSlider(value = starterValueLevel.value?.toFloat()!!, modifier = Modifier.padding(top = 16.dp),
+                        LevelSlider(value = starterValueLevel.value?.toFloat()!!, low = 0f, high = 254f, steps = 0,
+                            modifier = Modifier.padding(top = 16.dp),
                             onValueChange = { value : Float -> starterValueLevel.value = value.toUInt().toUByte() },
                             isEnabled = true
                         )
@@ -293,6 +299,30 @@ fun StarterView (homeAppVM: HomeAppViewModel) {
                         }
                     }
                 }
+                Thermostat -> {
+                    TextButton(onClick = { expandedThermostatSelection = true }, enabled = true) {
+                        val state: String? = StarterViewModel.valuesThermostat.filter { it.value == starterValueThermostat.value!! }.keys.firstOrNull()?.toString()
+                        Text(text = (state ?: stringResource(R.string.starter_text_select)) + " ▾", fontSize = 32.sp)
+                    }
+
+                    Row(horizontalArrangement = Arrangement.Start, modifier = Modifier.fillMaxWidth()) {
+                        Box {
+                            DropdownMenu(expanded = expandedThermostatSelection, onDismissRequest = { expandedThermostatSelection = false }) {
+                                for (value in StarterViewModel.valuesThermostat.keys) {
+                                    DropdownMenuItem(
+                                        text = { Text(value.toString()) },
+                                        onClick = {
+                                            scope.launch {
+                                                starterValueThermostat.value = StarterViewModel.valuesThermostat.get(value)
+                                            }
+                                            expandedThermostatSelection = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
         // Buttons to save changes for the starter on draft automation:
@@ -320,6 +350,7 @@ fun StarterView (homeAppVM: HomeAppViewModel) {
                             starterVM.valueLevel.emit(starterValueLevel.value!!)
                             starterVM.valueBooleanState.emit(starterValueBooleanState.value!!)
                             starterVM.valueOccupancy.emit(starterValueOccupancy.value!!)
+                            starterVM.valueThermostat.emit(starterValueThermostat.value!!)
 
                             draftVM.selectedStarterVM.emit(null)
                         }
@@ -348,6 +379,7 @@ fun StarterView (homeAppVM: HomeAppViewModel) {
                             starterVM.valueLevel.emit(starterValueLevel.value!!)
                             starterVM.valueBooleanState.emit(starterValueBooleanState.value!!)
                             starterVM.valueOccupancy.emit(starterValueOccupancy.value!!)
+                            starterVM.valueThermostat.emit(starterValueThermostat.value!!)
 
                             draftVM.starterVMs.value.add(starterVM)
                             draftVM.selectedStarterVM.emit(null)

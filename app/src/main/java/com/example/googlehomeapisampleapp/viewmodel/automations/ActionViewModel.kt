@@ -24,6 +24,8 @@ import com.google.home.Trait
 import com.google.home.TraitFactory
 import com.google.home.matter.standard.LevelControl
 import com.google.home.matter.standard.OnOff
+import com.google.home.matter.standard.Thermostat
+import com.google.home.matter.standard.ThermostatTrait
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -34,6 +36,9 @@ class ActionViewModel (val candidate: CandidateViewModel? = null) : ViewModel() 
         ON,
         OFF,
         MOVE_TO_LEVEL,
+        MODE_HEAT,
+        MODE_COOL,
+        MODE_OFF,
     }
 
     open class Actions (val actions : List<Action>)
@@ -47,6 +52,7 @@ class ActionViewModel (val candidate: CandidateViewModel? = null) : ViewModel() 
 
     val valueOnOff: MutableStateFlow<Boolean?>
     val valueLevel: MutableStateFlow<UByte?>
+    val valueThermostat: MutableStateFlow<ThermostatTrait.SystemModeEnum?>
 
     init {
         // Initialize containers for name and description:
@@ -59,6 +65,7 @@ class ActionViewModel (val candidate: CandidateViewModel? = null) : ViewModel() 
 
         valueOnOff = MutableStateFlow(true)
         valueLevel = MutableStateFlow(50u)
+        valueThermostat = MutableStateFlow(ThermostatTrait.SystemModeEnum.Off)
 
         viewModelScope.launch {
             // Subscribe to changes on dynamic values:
@@ -95,12 +102,20 @@ class ActionViewModel (val candidate: CandidateViewModel? = null) : ViewModel() 
             Action.MOVE_TO_LEVEL
         ))
 
+        // List of operations available when comparing booleans:
+        object ThermostatActions : Actions(listOf(
+            Action.MODE_HEAT,
+            Action.MODE_COOL,
+            Action.MODE_OFF,
+        ))
+
         // Map traits and the comparison operations they support:
         val actionActions: Map<TraitFactory<out Trait>, Actions> = mapOf(
             OnOff to OnOffActions,
             LevelControl to LevelActions,
             // BooleanState - No Actions
             // OccupancySensing - No Actions
+            Thermostat to ThermostatActions,
         )
     }
 }

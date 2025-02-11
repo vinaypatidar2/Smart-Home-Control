@@ -27,6 +27,8 @@ import com.google.home.matter.standard.LevelControl
 import com.google.home.matter.standard.OccupancySensing
 import com.google.home.matter.standard.OccupancySensingTrait
 import com.google.home.matter.standard.OnOff
+import com.google.home.matter.standard.Thermostat
+import com.google.home.matter.standard.ThermostatTrait
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -55,6 +57,7 @@ class StarterViewModel (val candidateVM: CandidateViewModel? = null) : ViewModel
     val valueLevel : MutableStateFlow<UByte>
     val valueBooleanState : MutableStateFlow<Boolean>
     val valueOccupancy : MutableStateFlow<OccupancySensingTrait.OccupancyBitmap>
+    val valueThermostat : MutableStateFlow<ThermostatTrait.SystemModeEnum>
 
     init {
         // Initialize containers for name and description:
@@ -69,6 +72,7 @@ class StarterViewModel (val candidateVM: CandidateViewModel? = null) : ViewModel
         valueLevel = MutableStateFlow(50u)
         valueBooleanState = MutableStateFlow(true)
         valueOccupancy = MutableStateFlow(OccupancySensingTrait.OccupancyBitmap())
+        valueThermostat = MutableStateFlow(ThermostatTrait.SystemModeEnum.Off)
 
         viewModelScope.launch {
             // Subscribe to changes on dynamic values:
@@ -120,36 +124,49 @@ class StarterViewModel (val candidateVM: CandidateViewModel? = null) : ViewModel
             LevelControl to LevelOperations,
             BooleanState to BooleanOperations,
             OccupancySensing to OccupancyOperations,
+            Thermostat to BooleanOperations,
         )
 
         enum class OnOffValue {
             On,
-            Off
+            Off,
         }
 
         val valuesOnOff: Map<OnOffValue, Boolean> = mapOf(
             OnOffValue.On to true,
-            OnOffValue.Off to false
+            OnOffValue.Off to false,
         )
 
         enum class ContactValue {
             Open,
-            Closed
+            Closed,
         }
 
         val valuesContact: Map<ContactValue, Boolean> = mapOf(
             ContactValue.Closed to true,
-            ContactValue.Open to false
+            ContactValue.Open to false,
         )
 
         enum class OccupancyValue {
             Occupied,
-            NotOccupied
+            NotOccupied,
         }
 
         val valuesOccupancy: Map<OccupancyValue, OccupancySensingTrait.OccupancyBitmap?> = mapOf(
             OccupancyValue.Occupied to OccupancySensingTrait.OccupancyBitmap(true),
-            OccupancyValue.NotOccupied to OccupancySensingTrait.OccupancyBitmap(false)
+            OccupancyValue.NotOccupied to OccupancySensingTrait.OccupancyBitmap(false),
+        )
+
+        enum class ThermostatValue {
+            Heat,
+            Cool,
+            Off,
+        }
+
+        val valuesThermostat: Map<ThermostatValue, ThermostatTrait.SystemModeEnum> = mapOf(
+            ThermostatValue.Heat to ThermostatTrait.SystemModeEnum.Heat,
+            ThermostatValue.Cool to ThermostatTrait.SystemModeEnum.Cool,
+            ThermostatValue.Off to ThermostatTrait.SystemModeEnum.Off,
         )
     }
 }

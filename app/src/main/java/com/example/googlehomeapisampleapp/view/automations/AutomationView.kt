@@ -48,6 +48,7 @@ import com.google.home.HomeDevice
 import com.google.home.automation.Action
 import com.google.home.automation.Command
 import com.google.home.automation.Starter
+import com.google.home.automation.UnknownCommand
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -128,9 +129,12 @@ fun AutomationView (homeAppVM: HomeAppViewModel) {
                             .padding(horizontal = 24.dp, vertical = 8.dp)) {
 
                         val actionDevice: HomeDevice? = action.entity as? HomeDevice
-                        val actionCommand: Command = action.behavior as Command
                         Text(actionDevice?.name ?: stringResource(R.string.automation_text_unknown), fontSize = 20.sp)
-                        Text(actionCommand.trait.toString(), fontSize = 16.sp)
+
+                        if (action.behavior !is UnknownCommand) {
+                            val actionCommand: Command = action.behavior as Command
+                            Text(actionCommand.trait.toString(), fontSize = 16.sp)
+                        }
                     }
                 }
 

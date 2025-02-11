@@ -31,6 +31,8 @@ import com.google.home.automation.greaterThanOrEquals
 import com.google.home.automation.lessThan
 import com.google.home.automation.lessThanOrEquals
 import com.google.home.automation.notEquals
+import com.google.home.google.SimplifiedThermostat
+import com.google.home.google.SimplifiedThermostatTrait
 import com.google.home.matter.standard.BooleanState
 import com.google.home.matter.standard.BooleanState.Companion.stateValue
 import com.google.home.matter.standard.LevelControl
@@ -41,6 +43,9 @@ import com.google.home.matter.standard.OccupancySensing.Companion.occupancy
 import com.google.home.matter.standard.OccupancySensingTrait
 import com.google.home.matter.standard.OnOff
 import com.google.home.matter.standard.OnOff.Companion.onOff
+import com.google.home.matter.standard.Thermostat
+import com.google.home.matter.standard.Thermostat.Companion.systemMode
+import com.google.home.matter.standard.ThermostatTrait
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class DraftViewModel (val candidateVM: CandidateViewModel? = null) : ViewModel() {
@@ -149,6 +154,18 @@ class DraftViewModel (val candidateVM: CandidateViewModel? = null) : ViewModel()
                                         else -> { MainActivity.showError(this, "Unexpected operation for Occupancy") }
                                     }
                                 }
+                                Thermostat -> {
+                                    val thermostatValue: ThermostatTrait.SystemModeEnum = starterVM.valueThermostat.value
+                                    val thermostatExpression: TypedExpression<out Thermostat> =
+                                        starterExpression as TypedExpression<out Thermostat>
+                                    when (starterOperation) {
+                                        StarterViewModel.Operation.EQUALS ->
+                                            condition { expression = thermostatExpression.systemMode equals thermostatValue }
+                                        StarterViewModel.Operation.NOT_EQUALS ->
+                                            condition { expression = thermostatExpression.systemMode notEquals thermostatValue }
+                                        else -> { MainActivity.showError(this, "Unexpected operation for Thermostat") }
+                                    }
+                                }
                                 else -> { MainActivity.showError(this, "Unsupported starter for automation creation") }
                             }
                         }
@@ -175,8 +192,14 @@ class DraftViewModel (val candidateVM: CandidateViewModel? = null) : ViewModel()
                                         LevelControlTrait.OptionsBitmap()
                                     )
                                 }
+                                ActionViewModel.Action.MODE_HEAT -> { SimplifiedThermostat
+                                    .setSystemMode(SimplifiedThermostatTrait.SystemModeEnum.Heat) }
+                                ActionViewModel.Action.MODE_COOL -> { SimplifiedThermostat
+                                    .setSystemMode(SimplifiedThermostatTrait.SystemModeEnum.Cool) }
+                                ActionViewModel.Action.MODE_OFF -> { SimplifiedThermostat
+                                    .setSystemMode(SimplifiedThermostatTrait.SystemModeEnum.Off) }
                                 else -> {
-                                    MainActivity.showError(this, "Unexpected operation for Occupancy")
+                                    MainActivity.showError(this, "Unexpected operation")
                                     return@action
                                 }
                             }

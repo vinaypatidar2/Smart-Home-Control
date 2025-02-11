@@ -187,7 +187,8 @@ fun ActionView (homeAppVM: HomeAppViewModel) {
                     }
 
                     Box (Modifier.padding(horizontal = 24.dp, vertical = 8.dp)) {
-                        LevelSlider(value = actionValueLevel.value?.toFloat()!!, modifier = Modifier.padding(top = 16.dp),
+                        LevelSlider(value = actionValueLevel.value?.toFloat()!!, low = 0f, high = 254f, steps = 0,
+                            modifier = Modifier.padding(top = 16.dp),
                             onValueChange = { value : Float -> actionValueLevel.value = value.toUInt().toUByte() },
                             isEnabled = true
                         )

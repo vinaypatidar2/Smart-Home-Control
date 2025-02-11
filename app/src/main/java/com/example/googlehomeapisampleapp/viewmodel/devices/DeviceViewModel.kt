@@ -40,6 +40,9 @@ import com.google.home.matter.standard.OnOffLightDevice
 import com.google.home.matter.standard.OnOffLightSwitchDevice
 import com.google.home.matter.standard.OnOffPluginUnitDevice
 import com.google.home.matter.standard.OnOffSensorDevice
+import com.google.home.matter.standard.TemperatureControl
+import com.google.home.matter.standard.Thermostat
+import com.google.home.matter.standard.ThermostatDevice
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -84,6 +87,10 @@ class DeviceViewModel (val device: HomeDevice) : ViewModel() {
                 if (typeInSet.metadata.isPrimaryType)
                     primaryType = typeInSet
 
+            // Optional: For devices with a single type that did not define a primary:
+            if (primaryType is UnknownDeviceType && typeSet.size == 1)
+                primaryType = typeSet.first()
+
             // Container for list of supported traits present on the primary device type:
             val supportedTraits: List<Trait> = getSupportedTraits(primaryType.traits())
 
@@ -124,6 +131,7 @@ class DeviceViewModel (val device: HomeDevice) : ViewModel() {
             OnOffSensorDevice to OnOff,
             ContactSensorDevice to BooleanState,
             OccupancySensorDevice to OccupancySensing,
+            ThermostatDevice to Thermostat,
         )
 
         // Map determining the user readable value for this device:
@@ -138,6 +146,7 @@ class DeviceViewModel (val device: HomeDevice) : ViewModel() {
             OnOffSensorDevice to "Sensor",
             ContactSensorDevice to "Sensor",
             OccupancySensorDevice to "Sensor",
+            ThermostatDevice to "Thermostat",
         )
 
         fun <T : Trait?> getDeviceStatus(type: DeviceType, traits : List<T>, connectivity: ConnectivityState) : String {
@@ -177,6 +186,7 @@ class DeviceViewModel (val device: HomeDevice) : ViewModel() {
                         }
                     }
                 }
+                is Thermostat -> { trait.systemMode.toString() }
                 else -> ""
             }
             return status

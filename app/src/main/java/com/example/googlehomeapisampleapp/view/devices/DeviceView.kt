@@ -17,19 +17,24 @@ limitations under the License.
 package com.example.googlehomeapisampleapp.view.devices
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,9 +44,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.googlehomeapisampleapp.MainActivity
 import com.example.googlehomeapisampleapp.viewmodel.HomeAppViewModel
 import com.example.googlehomeapisampleapp.viewmodel.devices.DeviceViewModel
 import com.google.home.ConnectivityState
@@ -52,6 +59,8 @@ import com.google.home.matter.standard.LevelControl
 import com.google.home.matter.standard.LevelControlTrait
 import com.google.home.matter.standard.OccupancySensing
 import com.google.home.matter.standard.OnOff
+import com.google.home.matter.standard.Thermostat
+import com.google.home.matter.standard.ThermostatTrait
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -123,7 +132,8 @@ fun ControlListItem (trait: Trait, isConnected: Boolean, type: DeviceType) {
             is LevelControl -> {
                 val level = trait.currentLevel
                 Text(trait.factory.toString(), fontSize = 20.sp)
-                LevelSlider(value = level?.toFloat()!!, modifier = Modifier.padding(top = 16.dp),
+                LevelSlider(value = level?.toFloat()!!, low = 0f, high = 254f, steps = 0,
+                    modifier = Modifier.padding(top = 16.dp),
                     onValueChange = { value : Float ->
                         scope.launch {
                             trait.moveToLevelWithOnOff(
@@ -148,19 +158,100 @@ fun ControlListItem (trait: Trait, isConnected: Boolean, type: DeviceType) {
                     Text(DeviceViewModel.getTraitStatus(trait, type), fontSize = 16.sp)
                 }
             }
+            is Thermostat -> {
+                val supportedModes = arrayOf(
+                    ThermostatTrait.SystemModeEnum.Heat,
+                    ThermostatTrait.SystemModeEnum.Cool,
+                    ThermostatTrait.SystemModeEnum.Off
+                )
+                val workingModes = arrayOf(
+                    ThermostatTrait.SystemModeEnum.Heat,
+                    ThermostatTrait.SystemModeEnum.Cool
+                )
+                var expanded: Boolean by remember { mutableStateOf(false) }
+                var vlow = 0f
+                var vhigh = 0f
+                var vset = 0f
+                Column (Modifier.fillMaxWidth()) {
+                    Box (Modifier.fillMaxWidth()) {
+                        Text("Ambient", fontSize = 20.sp)
+                        Text(trait.localTemperature?.div(100)?.toFloat().toString(), fontSize = 16.sp, modifier = Modifier.align(Alignment.CenterEnd))
+                    }
+                    Spacer (Modifier.height(16.dp))
+                    Box (Modifier.fillMaxWidth()) {
+                        Text("Mode", fontSize = 20.sp)
+                        TextButton(onClick = { expanded = true }, modifier = Modifier.align(Alignment.CenterEnd)) {
+                            Text(text = trait.systemMode.toString() + " ▾", fontSize = 20.sp)
+                        }
+
+                        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }, modifier = Modifier.align(Alignment.TopEnd)) {
+                            for (mode in supportedModes) {
+                                DropdownMenuItem(
+                                    text = { Text(mode.toString()) },
+                                    onClick = {
+                                        scope.launch { trait.update { setSystemMode(mode) } }
+                                        expanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                    Spacer (Modifier.height(16.dp))
+                    Box (Modifier.fillMaxWidth()) {
+                        Text("Setpoint", fontSize = 20.sp)
+                        Text(trait.occupiedHeatingSetpoint?.div(100)?.toFloat()!!.toString(), fontSize = 16.sp, modifier = Modifier.align(Alignment.TopEnd))
+                        when (trait.systemMode) {
+                            ThermostatTrait.SystemModeEnum.Heat -> {
+                                vset = trait.occupiedHeatingSetpoint?.toFloat()!!
+                                vlow = trait.absMinHeatSetpointLimit?.toFloat()!!
+                                vhigh = trait.absMaxHeatSetpointLimit?.toFloat()!!
+                            }
+                            ThermostatTrait.SystemModeEnum.Cool -> {
+                                vset = trait.occupiedCoolingSetpoint?.toFloat()!!
+                                vlow = trait.absMinCoolSetpointLimit?.toFloat()!!
+                                vhigh = trait.absMaxCoolSetpointLimit?.toFloat()!!
+                            }
+                            else -> {
+                                vset = trait.occupiedHeatingSetpoint?.toFloat()!!
+                                vlow = trait.absMinHeatSetpointLimit?.toFloat()!!
+                                vhigh = trait.absMaxHeatSetpointLimit?.toFloat()!!
+                            }
+                        }
+
+                        LevelSlider(value = vset, low = vlow, high = vhigh,
+                            steps = (vhigh - vlow).div(100f).toInt().minus(1),
+                            modifier = Modifier.padding(top = 16.dp),
+                            onValueChange = { value : Float ->
+                                scope.launch {
+                                    try {
+                                        trait.setpointRaiseLower(
+                                            ThermostatTrait.SetpointRaiseLowerModeEnum.Both,
+                                            (value - vset).div(10).toInt().toByte()
+                                        )
+                                    } catch (e:Exception) {
+                                        MainActivity.showWarning(this, "Exception: " + e.message)
+                                    }
+                                }
+                            },
+                            isEnabled = isConnected && trait.systemMode in workingModes
+                        )
+                    }
+                }
+            }
             else -> return
         }
     }
 }
 
 @Composable
-fun LevelSlider(value: Float, onValueChange: (Float) -> Unit, modifier: Modifier, isEnabled: Boolean) {
+fun LevelSlider(value: Float, low: Float, high: Float, steps: Int, onValueChange: (Float) -> Unit, modifier: Modifier, isEnabled: Boolean) {
     var level: Float by remember { mutableStateOf(value) }
     var oldValue: Float by remember { mutableStateOf(value) }
 
     Slider(
         value = level,
-        valueRange = 0f..254f,
+        valueRange = low..high,
+        steps = steps,
         modifier = modifier,
         onValueChange = { level = it },
         onValueChangeFinished = { onValueChange(level) },
