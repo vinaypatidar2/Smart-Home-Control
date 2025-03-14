@@ -12,8 +12,8 @@ android {
         applicationId = "com.example.googlehomeapisampleapp"
         minSdk = 29
         targetSdk = 34
-        versionCode = 24
-        versionName = "0.2.4"
+        versionCode = 28
+        versionName = "0.2.8"
     }
 
     buildTypes {

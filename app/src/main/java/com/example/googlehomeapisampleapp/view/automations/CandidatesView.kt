@@ -30,6 +30,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -74,6 +75,7 @@ fun CandidatesView (homeAppVM: HomeAppViewModel) {
 
 @Composable
 fun CandidateListComponent (homeAppVM: HomeAppViewModel) {
+    val candidates: List<CandidateViewModel> = homeAppVM.selectedCandidateVMs.collectAsState().value ?: return
 
     Column (Modifier.padding(horizontal = 16.dp, vertical = 8.dp).fillMaxWidth()) {
         Text("", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
@@ -81,7 +83,14 @@ fun CandidateListComponent (homeAppVM: HomeAppViewModel) {
 
     BlankListItem(homeAppVM)
 
-    /** Support for automation candidates will come in at a later release **/
+    Column (Modifier.padding(horizontal = 16.dp, vertical = 8.dp).fillMaxWidth()) {
+        Text("Candidates", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+    }
+
+    for (candidate in candidates) {
+        if(candidate.name != "[]")
+            CandidateListItem(candidate, homeAppVM)
+    }
 }
 
 @Composable

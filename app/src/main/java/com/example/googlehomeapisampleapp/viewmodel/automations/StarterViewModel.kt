@@ -74,11 +74,9 @@ class StarterViewModel (val candidateVM: CandidateViewModel? = null) : ViewModel
         valueOccupancy = MutableStateFlow(OccupancySensingTrait.OccupancyBitmap())
         valueThermostat = MutableStateFlow(ThermostatTrait.SystemModeEnum.Off)
 
-        viewModelScope.launch {
-            // Subscribe to changes on dynamic values:
-            launch { subscribeToDevice() }
-            launch { subscribeToTrait() }
-        }
+        // Subscribe to changes on dynamic values:
+        viewModelScope.launch { subscribeToDevice() }
+        viewModelScope.launch { subscribeToTrait() }
     }
 
     private suspend fun subscribeToDevice() {

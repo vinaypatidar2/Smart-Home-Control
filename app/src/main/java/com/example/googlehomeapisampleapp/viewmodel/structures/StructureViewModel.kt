@@ -34,7 +34,6 @@ class StructureViewModel (val structure: Structure) : ViewModel() {
     val deviceVMs : MutableStateFlow<List<DeviceViewModel>>
     val deviceVMsWithoutRooms : MutableStateFlow<List<DeviceViewModel>>
     val automationVMs : MutableStateFlow<List<AutomationViewModel>>
-    val candidateVMs : MutableStateFlow<List<CandidateViewModel>>
 
     init {
         // Initialize permanent values for a structure:
@@ -46,15 +45,11 @@ class StructureViewModel (val structure: Structure) : ViewModel() {
         deviceVMs = MutableStateFlow(mutableListOf())
         deviceVMsWithoutRooms = MutableStateFlow(mutableListOf())
         automationVMs = MutableStateFlow(mutableListOf())
-        candidateVMs = MutableStateFlow(mutableListOf())
 
-        viewModelScope.launch {
-            // Subscribe to changes on dynamic values:
-            launch { subscribeToRooms() }
-            launch { subscribeToDevices() }
-            launch { subscribeToAutomations() }
-            launch { subscribeToCandidates() }
-        }
+        // Subscribe to changes on dynamic values:
+        viewModelScope.launch { subscribeToRooms() }
+        viewModelScope.launch { subscribeToDevices() }
+        viewModelScope.launch { subscribeToAutomations() }
     }
 
     private suspend fun subscribeToRooms() {
@@ -99,19 +94,6 @@ class StructureViewModel (val structure: Structure) : ViewModel() {
             }
             // Store the ViewModels:
             this.automationVMs.emit(automationVMs)
-        }
-    }
-
-    private suspend fun subscribeToCandidates() {
-        // Subscribe to changes on automation candidates:
-        structure.candidates().collect { candidateSet ->
-            val candidateVMs = mutableListOf<CandidateViewModel>()
-            // Store automation candidates in container ViewModels:
-            for (candidate in candidateSet) {
-                candidateVMs.add(CandidateViewModel(candidate))
-            }
-            // Store the ViewModels:
-            this.candidateVMs.emit(candidateVMs)
         }
     }
 }

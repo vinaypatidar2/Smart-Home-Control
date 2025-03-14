@@ -19,17 +19,21 @@ package com.example.googlehomeapisampleapp.viewmodel.automations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.googlehomeapisampleapp.viewmodel.devices.DeviceViewModel
+import com.google.home.CommandDescriptor
 import com.google.home.DeviceType
 import com.google.home.Trait
 import com.google.home.TraitFactory
+import com.google.home.automation.CommandCandidate
 import com.google.home.matter.standard.LevelControl
+import com.google.home.matter.standard.LevelControlTrait
 import com.google.home.matter.standard.OnOff
+import com.google.home.matter.standard.OnOffTrait
 import com.google.home.matter.standard.Thermostat
-import com.google.home.matter.standard.ThermostatTrait
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-class ActionViewModel (val candidate: CandidateViewModel? = null) : ViewModel() {
+class ActionViewModel (val candidateVM: CandidateViewModel? = null) : ViewModel() {
 
     // List of operations available when creating automation starters:
     enum class Action {
@@ -50,9 +54,7 @@ class ActionViewModel (val candidate: CandidateViewModel? = null) : ViewModel() 
     val trait: MutableStateFlow<Trait?>
     val action: MutableStateFlow<Action?>
 
-    val valueOnOff: MutableStateFlow<Boolean?>
     val valueLevel: MutableStateFlow<UByte?>
-    val valueThermostat: MutableStateFlow<ThermostatTrait.SystemModeEnum?>
 
     init {
         // Initialize containers for name and description:
@@ -63,15 +65,14 @@ class ActionViewModel (val candidate: CandidateViewModel? = null) : ViewModel() 
         trait = MutableStateFlow(null)
         action = MutableStateFlow(null)
 
-        valueOnOff = MutableStateFlow(true)
         valueLevel = MutableStateFlow(50u)
-        valueThermostat = MutableStateFlow(ThermostatTrait.SystemModeEnum.Off)
 
-        viewModelScope.launch {
-            // Subscribe to changes on dynamic values:
-            launch { subscribeToDevice() }
-            launch { subscribeToTrait() }
-        }
+        if (candidateVM != null)
+            parseCandidateVM(candidateVM)
+
+        // Subscribe to changes on dynamic values:
+        viewModelScope.launch { subscribeToDevice() }
+        viewModelScope.launch { subscribeToTrait() }
     }
 
     private suspend fun subscribeToDevice() {
@@ -86,6 +87,15 @@ class ActionViewModel (val candidate: CandidateViewModel? = null) : ViewModel() 
         // Subscribe to trait selection, to automatically determine the description of the action:
         trait.collect { trait ->
             description.emit(trait?.factory.toString())
+        }
+    }
+
+    private fun parseCandidateVM(candidateVM: CandidateViewModel) {
+        viewModelScope.launch {
+            val candidate: CommandCandidate = candidateVM.candidate as CommandCandidate
+            deviceVM.emit(candidateVM.deviceVM)
+            trait.emit(candidateVM.deviceVM?.device?.trait(candidate.trait)?.first())
+            action.emit(commandMap.get(candidate.commandDescriptor))
         }
     }
 
@@ -116,6 +126,13 @@ class ActionViewModel (val candidate: CandidateViewModel? = null) : ViewModel() 
             // BooleanState - No Actions
             // OccupancySensing - No Actions
             Thermostat to ThermostatActions,
+        )
+
+        // Map of supported commands from Discovery API:
+        val commandMap: Map<CommandDescriptor, Action> = mapOf(
+            OnOffTrait.OnCommand to Action.ON,
+            OnOffTrait.OffCommand to Action.OFF,
+            LevelControlTrait.MoveToLevelWithOnOffCommand to Action.MOVE_TO_LEVEL
         )
     }
 }

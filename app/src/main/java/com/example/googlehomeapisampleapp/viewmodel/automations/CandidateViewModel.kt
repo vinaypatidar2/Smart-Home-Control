@@ -17,17 +17,33 @@ limitations under the License.
 package com.example.googlehomeapisampleapp.viewmodel.automations
 
 import androidx.lifecycle.ViewModel
+import com.example.googlehomeapisampleapp.viewmodel.devices.DeviceViewModel
+import com.google.home.automation.CommandCandidate
 import com.google.home.automation.NodeCandidate
 
-class CandidateViewModel (val candidate: NodeCandidate) : ViewModel() {
+class CandidateViewModel (val candidate: NodeCandidate, val deviceVM: DeviceViewModel? = null) : ViewModel() {
+
+    enum class CandidateType {
+        CommandCandidate,
+        Unknown
+    }
 
     var id : String
     var name : String
     var description : String
+    var type: CandidateType
 
     init {
         id = candidate.entity.id.id
-        name = candidate.fieldDetailsMap.keys.toString()
-        description = candidate.fieldDetailsMap.values.toString()
+
+        if (candidate is CommandCandidate) {
+            name = deviceVM!!.name + " - " + ActionViewModel.commandMap.get(candidate.commandDescriptor).toString()
+            description = "CommandCandidate"
+            type = CandidateType.CommandCandidate
+        } else {
+            name = "Unsupported Candidate"
+            description = "-"
+            type = CandidateType.Unknown
+        }
     }
 }

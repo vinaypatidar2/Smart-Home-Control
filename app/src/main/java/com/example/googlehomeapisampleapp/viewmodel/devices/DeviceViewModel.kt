@@ -40,7 +40,6 @@ import com.google.home.matter.standard.OnOffLightDevice
 import com.google.home.matter.standard.OnOffLightSwitchDevice
 import com.google.home.matter.standard.OnOffPluginUnitDevice
 import com.google.home.matter.standard.OnOffSensorDevice
-import com.google.home.matter.standard.TemperatureControl
 import com.google.home.matter.standard.Thermostat
 import com.google.home.matter.standard.ThermostatDevice
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -70,10 +69,8 @@ class DeviceViewModel (val device: HomeDevice) : ViewModel() {
         typeName = MutableStateFlow("--")
         status = MutableStateFlow("--")
 
-        viewModelScope.launch {
-            // Subscribe to changes on dynamic values:
-            launch { subscribeToType() }
-        }
+        // Subscribe to changes on dynamic values:
+        viewModelScope.launch { subscribeToType() }
     }
 
     private suspend fun subscribeToType() {

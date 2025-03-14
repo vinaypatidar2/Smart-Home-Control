@@ -21,15 +21,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.googlehomeapisampleapp.HomeApp
 import com.example.googlehomeapisampleapp.MainActivity
+import com.example.googlehomeapisampleapp.viewmodel.automations.ActionViewModel
 import com.example.googlehomeapisampleapp.viewmodel.automations.AutomationViewModel
 import com.example.googlehomeapisampleapp.viewmodel.automations.CandidateViewModel
 import com.example.googlehomeapisampleapp.viewmodel.automations.DraftViewModel
 import com.example.googlehomeapisampleapp.viewmodel.devices.DeviceViewModel
 import com.example.googlehomeapisampleapp.viewmodel.structures.StructureViewModel
 import com.google.home.Structure
+import com.google.home.automation.CommandCandidate
 import com.google.home.automation.DraftAutomation
+import com.google.home.automation.NodeCandidate
+import com.google.home.automation.UnknownDeviceType
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class HomeAppViewModel (val homeApp: HomeApp) : ViewModel() {
 
@@ -102,7 +109,35 @@ class HomeAppViewModel (val homeApp: HomeApp) : ViewModel() {
         viewModelScope.launch {
             val candidateVMList: MutableList<CandidateViewModel> = mutableListOf()
 
-            /** Support for automation candidates will come in at a later release **/
+            // Retrieve automation candidates for every device present in the selected structure:
+            for (deviceVM in selectedStructureVM.value!!.deviceVMs.value) {
+
+                // Check whether the device has a known type:
+                if(deviceVM.type.value is UnknownDeviceType)
+                    continue
+
+                // Retrieve a set of initial automation candidates from the device:
+                val candidates: Set<NodeCandidate> = deviceVM.device.candidates().first()
+
+                for (candidate in candidates) {
+                    // Check whether the candidate trait is supported:
+                    if(candidate.trait !in HomeApp.supportedTraits)
+                        continue
+                    // Check whether the candidate type is supported:
+                    when (candidate) {
+                        // Command candidate type:
+                        is CommandCandidate -> {
+                            // Check whether the command candidate has a supported command:
+                            if (candidate.commandDescriptor !in ActionViewModel.commandMap)
+                                continue
+                        }
+                        // Other candidate types are currently unsupported:
+                        else -> { continue }
+                    }
+
+                    candidateVMList.add(CandidateViewModel(candidate, deviceVM))
+                }
+            }
 
             // Store the ViewModels:
             selectedCandidateVMs.emit(candidateVMList)
@@ -116,7 +151,9 @@ class HomeAppViewModel (val homeApp: HomeApp) : ViewModel() {
             isPending.value = true
 
             // Call Automations API to create an automation from a draft:
-            try { structure.createAutomation(draft) }
+            try {
+                structure.createAutomation(draft)
+            }
             catch (e: Exception) {
                 MainActivity.showError(this, e.toString())
                 isPending.value = false

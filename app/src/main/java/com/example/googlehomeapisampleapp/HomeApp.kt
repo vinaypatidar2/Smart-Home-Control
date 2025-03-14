@@ -21,7 +21,6 @@ import androidx.activity.ComponentActivity
 import com.google.home.DeviceType
 import com.google.home.DeviceTypeFactory
 import com.google.home.FactoryRegistry
-import com.google.home.Home
 import com.google.home.HomeClient
 import com.google.home.HomeConfig
 import com.google.home.Trait
@@ -44,7 +43,6 @@ import com.google.home.matter.standard.TemperatureControl
 import com.google.home.matter.standard.TemperatureMeasurement
 import com.google.home.matter.standard.Thermostat
 import com.google.home.matter.standard.ThermostatDevice
-import com.google.home.matter.standard.ThermostatTrait
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 

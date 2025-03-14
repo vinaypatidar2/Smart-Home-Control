@@ -38,10 +38,8 @@ class RoomViewModel (val room: Room) : ViewModel() {
         // Initialize dynamic values for a structure:
         deviceVMs = MutableStateFlow(mutableListOf())
 
-        viewModelScope.launch {
-            // Subscribe to changes on dynamic values:
-            launch { subscribeToDevices() }
-        }
+        // Subscribe to changes on dynamic values:
+        viewModelScope.launch { subscribeToDevices() }
     }
 
     private suspend fun subscribeToDevices() {

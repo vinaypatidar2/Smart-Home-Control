@@ -71,6 +71,21 @@ class DraftViewModel (val candidateVM: CandidateViewModel? = null) : ViewModel()
 
         selectedStarterVM = MutableStateFlow(null)
         selectedActionVM = MutableStateFlow(null)
+
+        if (candidateVM != null)
+            parseCandidateVM(candidateVM)
+    }
+
+    fun parseCandidateVM (candidateVM: CandidateViewModel) {
+        when (candidateVM.type) {
+            CandidateViewModel.CandidateType.CommandCandidate -> {
+                val actionVM = ActionViewModel(candidateVM)
+                actionVMs.value.add(actionVM)
+            }
+            else -> {
+                // Unsupported Candidate Type.
+            }
+        }
     }
 
     fun getDraftAutomation() : DraftAutomation {
