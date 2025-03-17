@@ -14,13 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.example.googlehomeapisampleapp.viewmodel.structures
+package com.example.smarthomecontrol.viewmodel.structures
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 //import com.example.googlehomeapisampleapp.viewmodel.automations.AutomationViewModel
 //import com.example.googlehomeapisampleapp.viewmodel.automations.CandidateViewModel
-import com.example.googlehomeapisampleapp.viewmodel.devices.DeviceViewModel
+import com.example.smarthomecontrol.viewmodel.devices.DeviceViewModel
 import com.google.home.Structure
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch

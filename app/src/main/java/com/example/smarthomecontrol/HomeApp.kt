@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.example.googlehomeapisampleapp
+package com.example.smarthomecontrol
 
 import android.content.Context
 import androidx.activity.ComponentActivity
@@ -32,17 +32,11 @@ import com.google.home.matter.standard.DimmableLightDevice
 import com.google.home.matter.standard.ExtendedColorLightDevice
 import com.google.home.matter.standard.GenericSwitchDevice
 import com.google.home.matter.standard.LevelControl
-import com.google.home.matter.standard.OccupancySensing
-import com.google.home.matter.standard.OccupancySensorDevice
 import com.google.home.matter.standard.OnOff
 import com.google.home.matter.standard.OnOffLightDevice
 import com.google.home.matter.standard.OnOffLightSwitchDevice
 import com.google.home.matter.standard.OnOffPluginUnitDevice
 import com.google.home.matter.standard.OnOffSensorDevice
-import com.google.home.matter.standard.TemperatureControl
-import com.google.home.matter.standard.TemperatureMeasurement
-import com.google.home.matter.standard.Thermostat
-import com.google.home.matter.standard.ThermostatDevice
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
@@ -86,19 +80,14 @@ class HomeApp(val context: Context, val scope: CoroutineScope, val activity : Co
             OnOffPluginUnitDevice,
             OnOffSensorDevice,
             ContactSensorDevice,
-            OccupancySensorDevice,
-            ThermostatDevice,
+
         )
 
         // List of supported device traits by this app:
         val supportedTraits: List<TraitFactory<out Trait>> = listOf(
             OnOff,
             LevelControl,
-            BooleanState,
-            OccupancySensing,
-            Thermostat,
-            TemperatureControl,
-            TemperatureMeasurement,
+            BooleanState
         )
     }
 }

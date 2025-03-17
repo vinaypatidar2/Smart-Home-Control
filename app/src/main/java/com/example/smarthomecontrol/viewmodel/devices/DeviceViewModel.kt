@@ -14,11 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.example.googlehomeapisampleapp.viewmodel.devices
+package com.example.smarthomecontrol.viewmodel.devices
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.googlehomeapisampleapp.HomeApp
+import com.example.smarthomecontrol.HomeApp
 import com.google.home.ConnectivityState
 import com.google.home.DeviceType
 import com.google.home.DeviceTypeFactory
@@ -169,7 +169,7 @@ class DeviceViewModel (val device: HomeDevice) : ViewModel() {
             val status : String = when (trait) {
                 is OnOff -> { if (trait.onOff == true) "On" else "Off" }
                 is LevelControl -> { trait.currentLevel.toString() }
-                is OccupancySensing -> { if (trait.occupancy?.occupied == true) "Occupied" else "Unoccupied" }
+
                 is BooleanState -> {
                     // BooleanState is special, where the state gains meaning based on the device type:
                     when (type.factory) {
@@ -183,7 +183,7 @@ class DeviceViewModel (val device: HomeDevice) : ViewModel() {
                         }
                     }
                 }
-                is Thermostat -> { trait.systemMode.toString() }
+
                 else -> ""
             }
             return status

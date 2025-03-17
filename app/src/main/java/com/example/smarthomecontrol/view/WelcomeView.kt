@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.example.googlehomeapisampleapp.view
+package com.example.smarthomecontrol.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -34,22 +34,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.googlehomeapisampleapp.R
-import com.example.googlehomeapisampleapp.viewmodel.HomeAppViewModel
+//import com.example.googlehomeapisampleapp.R
+import com.example.smarthomecontrol.R
+import com.example.smarthomecontrol.viewmodel.HomeAppViewModel
 
 @Composable
 fun WelcomeView (homeAppVM: HomeAppViewModel) {
     Column (modifier = Modifier.fillMaxSize().padding(32.dp), verticalArrangement = Arrangement.Center) {
 
-        Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            Text(stringResource(R.string.welcome_text_1), fontSize = 32.sp)
-        }
+//        Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+//            Text(stringResource(R.string.welcome_text_1), fontSize = 32.sp)
+//        }
 
-        Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            Text(stringResource(R.string.welcome_text_2), fontSize = 32.sp)
-        }
+//        Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+//            Text(stringResource(R.string.welcome_text_2), fontSize = 32.sp)
+//        }
 
-        Spacer(Modifier.height(32.dp))
+//        Spacer(Modifier.height(32.dp))
 
         Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
             Image (
@@ -64,13 +65,13 @@ fun WelcomeView (homeAppVM: HomeAppViewModel) {
             Text(stringResource(R.string.welcome_text_3), fontSize = 24.sp, textAlign = TextAlign.Center)
         }
 
-        Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            Text(stringResource(R.string.welcome_text_4), fontSize = 24.sp, textAlign = TextAlign.Center)
-        }
+//        Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+//            Text(stringResource(R.string.welcome_text_4), fontSize = 24.sp, textAlign = TextAlign.Center)
+//        }
 
-        Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            Text(stringResource(R.string.welcome_text_5), fontSize = 24.sp, textAlign = TextAlign.Center)
-        }
+//        Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+//            Text(stringResource(R.string.welcome_text_5), fontSize = 24.sp, textAlign = TextAlign.Center)
+//        }
 
         Spacer(Modifier.height(32.dp))
 

@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.example.googlehomeapisampleapp
+package com.example.smarthomecontrol
 
 import android.content.Context
 import androidx.activity.ComponentActivity

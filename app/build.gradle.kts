@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.googlehomeapisampleapp"
+    namespace = "com.example.smarthomecontrol"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.googlehomeapisampleapp"
+        applicationId = "com.example.smarthomecontrol"
         minSdk = 29
         targetSdk = 34
         versionCode = 28

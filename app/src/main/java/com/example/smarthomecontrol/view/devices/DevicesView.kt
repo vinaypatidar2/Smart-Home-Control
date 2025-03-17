@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.example.googlehomeapisampleapp.view.devices
+package com.example.smarthomecontrol.view.devices
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,7 +32,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -54,12 +53,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.googlehomeapisampleapp.R
-import com.example.googlehomeapisampleapp.view.shared.TabbedMenuView
-import com.example.googlehomeapisampleapp.viewmodel.HomeAppViewModel
-import com.example.googlehomeapisampleapp.viewmodel.devices.DeviceViewModel
-import com.example.googlehomeapisampleapp.viewmodel.structures.RoomViewModel
-import com.example.googlehomeapisampleapp.viewmodel.structures.StructureViewModel
+//import com.example.googlehomeapisampleapp.R
+import com.example.smarthomecontrol.R
+//import com.example.googlehomeapisampleapp.view.shared.TabbedMenuView
+import com.example.smarthomecontrol.viewmodel.HomeAppViewModel
+import com.example.smarthomecontrol.viewmodel.devices.DeviceViewModel
+import com.example.smarthomecontrol.viewmodel.structures.RoomViewModel
+import com.example.smarthomecontrol.viewmodel.structures.StructureViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -84,7 +84,6 @@ fun DevicesView (homeAppVM: HomeAppViewModel) {
         DevicesTopBar("", listOf { DevicesAccountButton(homeAppVM) })
 
         Box (modifier = Modifier.weight(1f)) {
-
             Column {
                 Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
                     var structureText: String = structureName
@@ -117,11 +116,9 @@ fun DevicesView (homeAppVM: HomeAppViewModel) {
                     DeviceListComponent(homeAppVM)
                 }
             }
-
-
         }
 
-        TabbedMenuView(homeAppVM)
+//        TabbedMenuView(homeAppVM)
     }
 }
 
