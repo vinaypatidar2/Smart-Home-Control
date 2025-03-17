@@ -18,8 +18,8 @@ package com.example.googlehomeapisampleapp.viewmodel.structures
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.googlehomeapisampleapp.viewmodel.automations.AutomationViewModel
-import com.example.googlehomeapisampleapp.viewmodel.automations.CandidateViewModel
+//import com.example.googlehomeapisampleapp.viewmodel.automations.AutomationViewModel
+//import com.example.googlehomeapisampleapp.viewmodel.automations.CandidateViewModel
 import com.example.googlehomeapisampleapp.viewmodel.devices.DeviceViewModel
 import com.google.home.Structure
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,7 +33,7 @@ class StructureViewModel (val structure: Structure) : ViewModel() {
     val roomVMs : MutableStateFlow<List<RoomViewModel>>
     val deviceVMs : MutableStateFlow<List<DeviceViewModel>>
     val deviceVMsWithoutRooms : MutableStateFlow<List<DeviceViewModel>>
-    val automationVMs : MutableStateFlow<List<AutomationViewModel>>
+//    val automationVMs : MutableStateFlow<List<AutomationViewModel>>
 
     init {
         // Initialize permanent values for a structure:
@@ -44,12 +44,12 @@ class StructureViewModel (val structure: Structure) : ViewModel() {
         roomVMs = MutableStateFlow(mutableListOf())
         deviceVMs = MutableStateFlow(mutableListOf())
         deviceVMsWithoutRooms = MutableStateFlow(mutableListOf())
-        automationVMs = MutableStateFlow(mutableListOf())
+//        automationVMs = MutableStateFlow(mutableListOf())
 
         // Subscribe to changes on dynamic values:
         viewModelScope.launch { subscribeToRooms() }
         viewModelScope.launch { subscribeToDevices() }
-        viewModelScope.launch { subscribeToAutomations() }
+//        viewModelScope.launch { subscribeToAutomations() }
     }
 
     private suspend fun subscribeToRooms() {
@@ -84,16 +84,16 @@ class StructureViewModel (val structure: Structure) : ViewModel() {
         }
     }
 
-    private suspend fun subscribeToAutomations() {
-        // Subscribe to changes on automations:
-        structure.automations().collect { automationSet ->
-            val automationVMs = mutableListOf<AutomationViewModel>()
-            // Store automations in container ViewModels:
-            for (automation in automationSet) {
-                automationVMs.add(AutomationViewModel(automation))
-            }
-            // Store the ViewModels:
-            this.automationVMs.emit(automationVMs)
-        }
-    }
+//    private suspend fun subscribeToAutomations() {
+//        // Subscribe to changes on automations:
+//        structure.automations().collect { automationSet ->
+//            val automationVMs = mutableListOf<AutomationViewModel>()
+//            // Store automations in container ViewModels:
+//            for (automation in automationSet) {
+//                automationVMs.add(AutomationViewModel(automation))
+//            }
+//            // Store the ViewModels:
+//            this.automationVMs.emit(automationVMs)
+//        }
+//    }
 }

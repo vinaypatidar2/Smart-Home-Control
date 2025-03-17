@@ -55,11 +55,11 @@ fun TabbedMenuView (homeAppVM: HomeAppViewModel) {
                     homeAppVM.viewModelScope.launch{
                         homeAppVM.selectedTab.emit(HomeAppViewModel.NavigationTab.DEVICES)
                     }})
-            Column(content = { AutomationsButtonContent(homeAppVM) },
-                modifier = Modifier.fillMaxWidth().weight(1f).padding(16.dp).clickable{
-                    homeAppVM.viewModelScope.launch{
-                        homeAppVM.selectedTab.emit(HomeAppViewModel.NavigationTab.AUTOMATIONS)
-                    }})
+//            Column(content = { AutomationsButtonContent(homeAppVM) },
+//                modifier = Modifier.fillMaxWidth().weight(1f).padding(16.dp).clickable{
+//                    homeAppVM.viewModelScope.launch{
+//                        homeAppVM.selectedTab.emit(HomeAppViewModel.NavigationTab.AUTOMATIONS)
+//                    }})
         }
         // Spacer to offset the system gesture bars for edge-to-edge applications:
         Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))
@@ -79,15 +79,15 @@ fun DevicesButtonContent (homeAppVM: HomeAppViewModel) {
     }
 }
 
-@Composable
-fun AutomationsButtonContent (homeAppVM: HomeAppViewModel) {
-    val selectedTab: HomeAppViewModel.NavigationTab = homeAppVM.selectedTab.collectAsState().value
-    val isSelected: Boolean = (selectedTab == HomeAppViewModel.NavigationTab.AUTOMATIONS)
-    val buttonColor: Color = if (isSelected) MaterialTheme.colorScheme.primary else Color.DarkGray
-
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-        Icon(imageVector = ImageVector.vectorResource(R.drawable.icon_automations), "",
-            Modifier.size(36.dp).background(Color.Transparent), tint = buttonColor)
-        Text(stringResource(R.string.tab_button_automations), color = buttonColor)
-    }
-}
+//@Composable
+//fun AutomationsButtonContent (homeAppVM: HomeAppViewModel) {
+//    val selectedTab: HomeAppViewModel.NavigationTab = homeAppVM.selectedTab.collectAsState().value
+//    val isSelected: Boolean = (selectedTab == HomeAppViewModel.NavigationTab.AUTOMATIONS)
+//    val buttonColor: Color = if (isSelected) MaterialTheme.colorScheme.primary else Color.DarkGray
+//
+//    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+//        Icon(imageVector = ImageVector.vectorResource(R.drawable.icon_automations), "",
+//            Modifier.size(36.dp).background(Color.Transparent), tint = buttonColor)
+//        Text(stringResource(R.string.tab_button_automations), color = buttonColor)
+//    }
+//}

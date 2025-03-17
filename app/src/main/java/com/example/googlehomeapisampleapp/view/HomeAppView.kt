@@ -1,19 +1,3 @@
-
-/* Copyright 2025 Google LLC
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    https://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package com.example.googlehomeapisampleapp.view
 
 import androidx.compose.foundation.background
@@ -29,20 +13,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.googlehomeapisampleapp.ui.theme.GoogleHomeAPISampleAppTheme
-import com.example.googlehomeapisampleapp.view.automations.ActionView
-import com.example.googlehomeapisampleapp.view.automations.AutomationView
-import com.example.googlehomeapisampleapp.view.automations.AutomationsView
-import com.example.googlehomeapisampleapp.view.automations.CandidatesView
-import com.example.googlehomeapisampleapp.view.automations.DraftView
-import com.example.googlehomeapisampleapp.view.automations.StarterView
+//import com.example.googlehomeapisampleapp.view.automations.ActionView
+//import com.example.googlehomeapisampleapp.view.automations.AutomationView
+//import com.example.googlehomeapisampleapp.view.automations.AutomationsView
+//import com.example.googlehomeapisampleapp.view.automations.CandidatesView
+//import com.example.googlehomeapisampleapp.view.automations.DraftView
+//import com.example.googlehomeapisampleapp.view.automations.StarterView
 import com.example.googlehomeapisampleapp.view.devices.DeviceView
 import com.example.googlehomeapisampleapp.view.devices.DevicesView
 import com.example.googlehomeapisampleapp.viewmodel.HomeAppViewModel
-import com.example.googlehomeapisampleapp.viewmodel.automations.ActionViewModel
-import com.example.googlehomeapisampleapp.viewmodel.automations.AutomationViewModel
-import com.example.googlehomeapisampleapp.viewmodel.automations.CandidateViewModel
-import com.example.googlehomeapisampleapp.viewmodel.automations.DraftViewModel
-import com.example.googlehomeapisampleapp.viewmodel.automations.StarterViewModel
+//import com.example.googlehomeapisampleapp.viewmodel.automations.ActionViewModel
+//import com.example.googlehomeapisampleapp.viewmodel.automations.AutomationViewModel
+//import com.example.googlehomeapisampleapp.viewmodel.automations.CandidateViewModel
+//import com.example.googlehomeapisampleapp.viewmodel.automations.DraftViewModel
+//import com.example.googlehomeapisampleapp.viewmodel.automations.StarterViewModel
 import com.example.googlehomeapisampleapp.viewmodel.devices.DeviceViewModel
 
 
@@ -54,11 +38,11 @@ fun HomeAppView (homeAppVM: HomeAppViewModel) {
     /** Values tracking what is being selected on the app **/
     val selectedTab: HomeAppViewModel.NavigationTab by homeAppVM.selectedTab.collectAsState()
     val selectedDeviceVM: DeviceViewModel? by homeAppVM.selectedDeviceVM.collectAsState()
-    val selectedAutomationVM: AutomationViewModel? by homeAppVM.selectedAutomationVM.collectAsState()
-    val selectedCandidateVMs: List<CandidateViewModel>? by homeAppVM.selectedCandidateVMs.collectAsState()
-    val selectedDraftVM: DraftViewModel? by homeAppVM.selectedDraftVM.collectAsState()
-    val selectedStarterVM: StarterViewModel? = selectedDraftVM?.selectedStarterVM?.collectAsState()?.value
-    val selectedActionVM: ActionViewModel? = selectedDraftVM?.selectedActionVM?.collectAsState()?.value
+//    val selectedAutomationVM: AutomationViewModel? by homeAppVM.selectedAutomationVM.collectAsState()
+//    val selectedCandidateVMs: List<CandidateViewModel>? by homeAppVM.selectedCandidateVMs.collectAsState()
+//    val selectedDraftVM: DraftViewModel? by homeAppVM.selectedDraftVM.collectAsState()
+//    val selectedStarterVM: StarterViewModel? = selectedDraftVM?.selectedStarterVM?.collectAsState()?.value
+//    val selectedActionVM: ActionViewModel? = selectedDraftVM?.selectedActionVM?.collectAsState()?.value
 
     // Apply theme on the top-level view:
     GoogleHomeAPISampleAppTheme {
@@ -81,38 +65,38 @@ fun HomeAppView (homeAppVM: HomeAppViewModel) {
                 if (selectedDeviceVM != null) {
                     DeviceView(homeAppVM)
                 }
+                DevicesView(homeAppVM)
 
-                // If an automation is selected, show the automation details:
-                if (selectedAutomationVM != null) {
-                    AutomationView(homeAppVM)
-                }
+//                // If an automation is selected, show the automation details:
+//                if (selectedAutomationVM != null) {
+//                    AutomationView(homeAppVM)
+//                }
 
-                // If a starter is selected for a draft automation, show the starter editor:
-                if (selectedStarterVM != null) {
-                    StarterView(homeAppVM)
-                }
+//                // If a starter is selected for a draft automation, show the starter editor:
+//                if (selectedStarterVM != null) {
+//                    StarterView(homeAppVM)
+//                }
 
                 // If an action is selected for a draft automation, show the action editor:
-                if (selectedActionVM != null) {
-                    ActionView(homeAppVM)
-                }
-
-                // If a draft automation is selected, show the draft editor:
-                if (selectedDraftVM != null) {
-                    DraftView(homeAppVM)
-                }
-
-                // If the automation candidates are selected, show the candidates:
-                if (selectedCandidateVMs != null) {
-                    CandidatesView(homeAppVM)
-                }
+//                if (selectedActionVM != null) {
+//                    ActionView(homeAppVM)
+//                }
+//
+//                // If a draft automation is selected, show the draft editor:
+//                if (selectedDraftVM != null) {
+//                    DraftView(homeAppVM)
+//                }
+//
+//                // If the automation candidates are selected, show the candidates:
+//                if (selectedCandidateVMs != null) {
+//                    CandidatesView(homeAppVM)
+//                }
 
                 // If nothing above is selected, then show one of the two main views:
-                when (selectedTab) {
-                    HomeAppViewModel.NavigationTab.DEVICES -> DevicesView(homeAppVM)
-                    HomeAppViewModel.NavigationTab.AUTOMATIONS -> AutomationsView(homeAppVM)
+//                when (selectedTab) {
+//                    HomeAppViewModel.NavigationTab.DEVICES -> DevicesView(homeAppVM)
+//                    HomeAppViewModel.NavigationTab.AUTOMATIONS -> AutomationsView(homeAppVM)
                 }
             }
         }
     }
-}

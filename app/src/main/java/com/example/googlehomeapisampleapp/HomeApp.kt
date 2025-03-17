@@ -51,7 +51,7 @@ class HomeApp(val context: Context, val scope: CoroutineScope, val activity : Co
     var homeClient: HomeClient
 
     val permissionsManager : PermissionsManager
-    val commissioningManager : CommissioningManager
+//    val commissioningManager : CommissioningManager
 
     init {
         // Registry to record device types and traits used in this app:
@@ -71,7 +71,7 @@ class HomeApp(val context: Context, val scope: CoroutineScope, val activity : Co
 
         // Initialize supporting classes for Permissions and Commissioning APIs:
         permissionsManager = PermissionsManager(context, scope, activity, homeClient)
-        commissioningManager = CommissioningManager(context, scope, activity)
+//        commissioningManager = CommissioningManager(context, scope, activity)
     }
 
     companion object {

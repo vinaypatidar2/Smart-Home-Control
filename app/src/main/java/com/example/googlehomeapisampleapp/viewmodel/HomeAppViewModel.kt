@@ -21,10 +21,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.googlehomeapisampleapp.HomeApp
 import com.example.googlehomeapisampleapp.MainActivity
-import com.example.googlehomeapisampleapp.viewmodel.automations.ActionViewModel
-import com.example.googlehomeapisampleapp.viewmodel.automations.AutomationViewModel
-import com.example.googlehomeapisampleapp.viewmodel.automations.CandidateViewModel
-import com.example.googlehomeapisampleapp.viewmodel.automations.DraftViewModel
+//import com.example.googlehomeapisampleapp.viewmodel.automations.ActionViewModel
+//import com.example.googlehomeapisampleapp.viewmodel.automations.AutomationViewModel
+//import com.example.googlehomeapisampleapp.viewmodel.automations.CandidateViewModel
+//import com.example.googlehomeapisampleapp.viewmodel.automations.DraftViewModel
 import com.example.googlehomeapisampleapp.viewmodel.devices.DeviceViewModel
 import com.example.googlehomeapisampleapp.viewmodel.structures.StructureViewModel
 import com.google.home.Structure
@@ -52,9 +52,9 @@ class HomeAppViewModel (val homeApp: HomeApp) : ViewModel() {
     // Containers tracking the active object being edited:
     var selectedStructureVM: MutableStateFlow<StructureViewModel?>
     var selectedDeviceVM: MutableStateFlow<DeviceViewModel?>
-    var selectedAutomationVM: MutableStateFlow<AutomationViewModel?>
-    var selectedDraftVM: MutableStateFlow<DraftViewModel?>
-    var selectedCandidateVMs: MutableStateFlow<List<CandidateViewModel>?>
+//    var selectedAutomationVM: MutableStateFlow<AutomationViewModel?>
+//    var selectedDraftVM: MutableStateFlow<DraftViewModel?>
+//    var selectedCandidateVMs: MutableStateFlow<List<CandidateViewModel>?>
 
     // Container to store returned structures from the app:
     var structureVMs: MutableStateFlow<List<StructureViewModel>>
@@ -66,9 +66,9 @@ class HomeAppViewModel (val homeApp: HomeApp) : ViewModel() {
         // Initialize containers storing active objects:
         selectedStructureVM = MutableStateFlow(null)
         selectedDeviceVM = MutableStateFlow(null)
-        selectedAutomationVM = MutableStateFlow(null)
-        selectedDraftVM = MutableStateFlow(null)
-        selectedCandidateVMs = MutableStateFlow(null)
+//        selectedAutomationVM = MutableStateFlow(null)
+//        selectedDraftVM = MutableStateFlow(null)
+//        selectedCandidateVMs = MutableStateFlow(null)
 
         // Initialize the container to store structures:
         structureVMs = MutableStateFlow(mutableListOf())
@@ -105,66 +105,66 @@ class HomeAppViewModel (val homeApp: HomeApp) : ViewModel() {
         }
     }
 
-    fun showCandidates() {
-        viewModelScope.launch {
-            val candidateVMList: MutableList<CandidateViewModel> = mutableListOf()
+//    fun showCandidates() {
+//        viewModelScope.launch {
+////            val candidateVMList: MutableList<CandidateViewModel> = mutableListOf()
+//
+//            // Retrieve automation candidates for every device present in the selected structure:
+//            for (deviceVM in selectedStructureVM.value!!.deviceVMs.value) {
+//
+//                // Check whether the device has a known type:
+//                if(deviceVM.type.value is UnknownDeviceType)
+//                    continue
+//
+//                // Retrieve a set of initial automation candidates from the device:
+//                val candidates: Set<NodeCandidate> = deviceVM.device.candidates().first()
+//
+//                for (candidate in candidates) {
+//                    // Check whether the candidate trait is supported:
+//                    if(candidate.trait !in HomeApp.supportedTraits)
+//                        continue
+//                    // Check whether the candidate type is supported:
+////                    when (candidate) {
+////                        // Command candidate type:
+////                        is CommandCandidate -> {
+////                            // Check whether the command candidate has a supported command:
+////                            if (candidate.commandDescriptor !in ActionViewModel.commandMap)
+////                                continue
+////                        }
+////                        // Other candidate types are currently unsupported:
+////                        else -> { continue }
+////                    }
+//
+//                    candidateVMList.add(CandidateViewModel(candidate, deviceVM))
+//                }
+//            }
+//
+//            // Store the ViewModels:
+//            selectedCandidateVMs.emit(candidateVMList)
+//        }
+//    }
 
-            // Retrieve automation candidates for every device present in the selected structure:
-            for (deviceVM in selectedStructureVM.value!!.deviceVMs.value) {
-
-                // Check whether the device has a known type:
-                if(deviceVM.type.value is UnknownDeviceType)
-                    continue
-
-                // Retrieve a set of initial automation candidates from the device:
-                val candidates: Set<NodeCandidate> = deviceVM.device.candidates().first()
-
-                for (candidate in candidates) {
-                    // Check whether the candidate trait is supported:
-                    if(candidate.trait !in HomeApp.supportedTraits)
-                        continue
-                    // Check whether the candidate type is supported:
-                    when (candidate) {
-                        // Command candidate type:
-                        is CommandCandidate -> {
-                            // Check whether the command candidate has a supported command:
-                            if (candidate.commandDescriptor !in ActionViewModel.commandMap)
-                                continue
-                        }
-                        // Other candidate types are currently unsupported:
-                        else -> { continue }
-                    }
-
-                    candidateVMList.add(CandidateViewModel(candidate, deviceVM))
-                }
-            }
-
-            // Store the ViewModels:
-            selectedCandidateVMs.emit(candidateVMList)
-        }
-    }
-
-    fun createAutomation(isPending: MutableState<Boolean>) {
-        viewModelScope.launch {
-            val structure : Structure = selectedStructureVM.value?.structure!!
-            val draft : DraftAutomation = selectedDraftVM.value?.getDraftAutomation()!!
-            isPending.value = true
-
-            // Call Automations API to create an automation from a draft:
-            try {
-                structure.createAutomation(draft)
-            }
-            catch (e: Exception) {
-                MainActivity.showError(this, e.toString())
-                isPending.value = false
-                return@launch
-            }
-
-            // Scrap the draft and automation candidates used in the process:
-            selectedCandidateVMs.emit(null)
-            selectedDraftVM.emit(null)
-            isPending.value = false
-        }
-    }
+//    fun createAutomation(isPending: MutableState<Boolean>) {
+//        viewModelScope.launch {
+//            val structure : Structure = selectedStructureVM.value?.structure!!
+//            val draft : DraftAutomation = selectedDraftVM.value?.getDraftAutomation()!!
+//            isPending.value = true
+//
+//            // Call Automations API to create an automation from a draft:
+//            try {
+//                structure.createAutomation(draft)
+//            }
+//            catch (e: Exception) {
+//                MainActivity.showError(this, e.toString())
+//                isPending.value = false
+//                return@launch
+//            }
+//
+//            // Scrap the draft and automation candidates used in the process:
+//            selectedCandidateVMs.emit(null)
+//            selectedDraftVM.emit(null)
+//            isPending.value = false
+//        }
+//    }
 
 }

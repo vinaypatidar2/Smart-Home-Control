@@ -48,6 +48,10 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
+    implementation("androidx.compose.material3:material3:1.1.2")
     // Home API SDK dependency:
     implementation(libs.play.services.home)
+//    implementation("com.google.android.gms:play-services-location:21.3.0")
+//    implementation("com.google.android.gms:play-services-home:16.0.0")
+//    implementation("com.google.apis:google-api-services-homegraph:v1-rev20230720-2.0.0")
 }

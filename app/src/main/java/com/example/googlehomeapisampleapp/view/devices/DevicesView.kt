@@ -118,10 +118,6 @@ fun DevicesView (homeAppVM: HomeAppViewModel) {
                 }
             }
 
-            Button(
-                onClick = { homeAppVM.homeApp.commissioningManager.requestCommissioning() },
-                modifier = Modifier.padding(16.dp).align(Alignment.BottomEnd)) {
-                        Text(stringResource(R.string.devices_button_add)) }
 
         }
 
