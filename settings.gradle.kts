@@ -24,6 +24,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Google Home API Sample App"
+rootProject.name = "Smart Home Control"
 include(":app")
  

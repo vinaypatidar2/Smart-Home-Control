@@ -36,7 +36,7 @@ fun HomeAppView (homeAppVM: HomeAppViewModel) {
     val isSignedIn: Boolean = homeAppVM.homeApp.permissionsManager.isSignedIn.collectAsState().value
 
     /** Values tracking what is being selected on the app **/
-    val selectedTab: HomeAppViewModel.NavigationTab by homeAppVM.selectedTab.collectAsState()
+//    val selectedTab: HomeAppViewModel.NavigationTab by homeAppVM.selectedTab.collectAsState()
     val selectedDeviceVM: DeviceViewModel? by homeAppVM.selectedDeviceVM.collectAsState()
 
     // Apply theme on the top-level view:
