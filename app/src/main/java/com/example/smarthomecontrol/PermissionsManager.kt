@@ -2,6 +2,7 @@ package com.example.smarthomecontrol
 
 import android.content.Context
 import androidx.activity.ComponentActivity
+import androidx.core.content.edit
 import com.google.home.HomeClient
 import com.google.home.HomeException
 import com.google.home.PermissionsResult
@@ -12,16 +13,30 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-class PermissionsManager(val context: Context, val scope: CoroutineScope, val activity: ComponentActivity, val client: HomeClient) {
+private const val PREF_NAME = "home_app_prefs"
+private const val KEY_IS_SIGNED_IN = "is_signed_in"
+
+class PermissionsManager(
+    val context: Context,
+    val scope: CoroutineScope,
+    val activity: ComponentActivity,
+    val client: HomeClient
+) {
 
     var isSignedIn: MutableStateFlow<Boolean>
+        private set
+
+    private val sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
 
     init {
-        // StateFlow to carry the result for successful sign-in:
-        isSignedIn = MutableStateFlow(false)
+        // Initialize the isSignedIn StateFlow with the cached value or false:
+        val initialSignInState = sharedPreferences.getBoolean(KEY_IS_SIGNED_IN, false)
+        isSignedIn = MutableStateFlow(initialSignInState)
+
         // Register permission caller callback on HomeClient:
         client.registerActivityResultCallerForPermissions(activity)
-        // Check the current permission state:
+
+        // Check the current permission state and update cache:
         checkPermissions()
     }
 
@@ -32,7 +47,10 @@ class PermissionsManager(val context: Context, val scope: CoroutineScope, val ac
                 state != PermissionsState.PERMISSIONS_STATE_UNINITIALIZED
             }
             // Adjust the sign-in status according to permission state:
-            isSignedIn.emit(permissionsState == PermissionsState.GRANTED)
+            val newSignInState = permissionsState == PermissionsState.GRANTED
+            isSignedIn.emit(newSignInState)
+            //update the sharedpref
+            updateSignInStatusCache(newSignInState)
             // Report the permission state:
             reportPermissionState(permissionsState)
         }
@@ -44,16 +62,24 @@ class PermissionsManager(val context: Context, val scope: CoroutineScope, val ac
                 // Request permissions from the Permissions API and record the result:
                 val result: PermissionsResult = client.requestPermissions(forceLaunch = true)
                 // Adjust the sign-in status according to permission result:
-                if (result.status == PermissionsResultStatus.SUCCESS)
-                    isSignedIn.emit(true)
+                val newSignInState = result.status == PermissionsResultStatus.SUCCESS
+                isSignedIn.emit(newSignInState)
+                updateSignInStatusCache(newSignInState)
                 // Report the permission result:
                 reportPermissionResult(result)
+            } catch (e: HomeException) {
+                MainActivity.showError(this, e.message.toString())
             }
-            catch (e: HomeException) { MainActivity.showError(this, e.message.toString()) }
         }
     }
 
-    private fun reportPermissionState(permissionState : PermissionsState) {
+    private fun updateSignInStatusCache(isSignedIn: Boolean) {
+        sharedPreferences.edit {
+            putBoolean(KEY_IS_SIGNED_IN, isSignedIn)
+        }
+    }
+
+    private fun reportPermissionState(permissionState: PermissionsState) {
         val message: String = "Permissions State: " + permissionState.name
         // Report the permission state:
         when (permissionState) {
@@ -85,6 +111,4 @@ class PermissionsManager(val context: Context, val scope: CoroutineScope, val ac
             else -> MainActivity.showError(this, message)
         }
     }
-
 }
-
