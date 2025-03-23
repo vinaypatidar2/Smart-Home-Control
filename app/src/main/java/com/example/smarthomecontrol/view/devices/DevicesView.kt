@@ -50,17 +50,6 @@ import kotlinx.coroutines.launch
 import com.google.home.Trait
 import com.google.home.matter.standard.OnOff
 import androidx.compose.material3.Switch
-import com.example.smarthomecontrol.BlinkDetectionHelper
-import kotlinx.coroutines.Dispatchers
-import android.content.Context
-import androidx.camera.view.PreviewView
-import androidx.lifecycle.LifecycleOwner
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.viewinterop.AndroidView
-import android.util.Log
-import android.view.ViewGroup
 
 @Composable
 fun DevicesAccountButton (homeAppVM: HomeAppViewModel) {
@@ -117,54 +106,8 @@ fun DevicesView (homeAppVM: HomeAppViewModel) {
             }
         }
 
-        CameraPreviewAndBlinkDetection(homeAppVM)
+
     }
-}
-@Composable
-fun CameraPreviewAndBlinkDetection(homeAppVM: HomeAppViewModel) {
-    val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val previewView = remember { PreviewView(context) }
-    val scope = rememberCoroutineScope()
-    val selectedDeviceVM: DeviceViewModel? = homeAppVM.selectedDeviceVM.collectAsState().value // Get the selected device
-
-    var blinkDetectionHelper: BlinkDetectionHelper? = null
-
-    DisposableEffect(lifecycleOwner) {
-        blinkDetectionHelper = BlinkDetectionHelper(context, previewView) {
-            scope.launch(Dispatchers.Main) {
-                selectedDeviceVM?.let { deviceVM ->
-                    val traits: List<Trait> by deviceVM.traits.collectAsState()
-                    val isConnected: Boolean = (deviceVM.connectivity == ConnectivityState.ONLINE)
-                    val onOffTrait = traits.find { it is OnOff } as? OnOff
-                    if (onOffTrait != null && isConnected) {
-                        val currentState = onOffTrait.onOff ?: false
-                        if (currentState) {
-                            onOffTrait.off()
-                            deviceVM.status.emit("Off")
-                        } else {
-                            onOffTrait.on()
-                            deviceVM.status.emit("On")
-                        }
-                    }
-                }
-            }
-        }
-        blinkDetectionHelper?.startCamera(lifecycleOwner)
-        onDispose {
-            blinkDetectionHelper?.shutdownCameraExecutor()
-        }
-    }
-
-    AndroidView(
-        factory = {
-            previewView.apply {
-                layoutParams = ViewGroup.LayoutParams(150, 150)
-                scaleType = PreviewView.ScaleType.FILL_CENTER
-                visibility = android.view.View.VISIBLE
-            }
-        }
-    )
 }
 
 @Composable
@@ -173,7 +116,6 @@ fun DeviceListItem (deviceVM: DeviceViewModel, homeAppVM: HomeAppViewModel) {
     val deviceStatus: String = deviceVM.status.collectAsState().value
     val traits: List<Trait> by deviceVM.traits.collectAsState()
     val isConnected: Boolean = (deviceVM.connectivity == ConnectivityState.ONLINE)
-
 
     Column (Modifier
         .padding(horizontal = 24.dp, vertical = 8.dp)
@@ -194,14 +136,12 @@ fun DeviceListItem (deviceVM: DeviceViewModel, homeAppVM: HomeAppViewModel) {
                             } else {
                                 onOffTrait.off()
                             }
-                            deviceVM.status.emit(if(isChecked) "On" else "Off")
                         }
                     }
                 },
                 enabled = isConnected
             )
         }
-
     }
 }
 
