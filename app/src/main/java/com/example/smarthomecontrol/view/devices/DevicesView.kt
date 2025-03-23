@@ -44,8 +44,23 @@ import com.example.smarthomecontrol.viewmodel.HomeAppViewModel
 import com.example.smarthomecontrol.viewmodel.devices.DeviceViewModel
 import com.example.smarthomecontrol.viewmodel.structures.RoomViewModel
 import com.example.smarthomecontrol.viewmodel.structures.StructureViewModel
+import com.google.home.ConnectivityState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import com.google.home.Trait
+import com.google.home.matter.standard.OnOff
+import androidx.compose.material3.Switch
+import com.example.smarthomecontrol.BlinkDetectionHelper
+import kotlinx.coroutines.Dispatchers
+import android.content.Context
+import androidx.camera.view.PreviewView
+import androidx.lifecycle.LifecycleOwner
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.viewinterop.AndroidView
+import android.util.Log
+import android.view.ViewGroup
 
 @Composable
 fun DevicesAccountButton (homeAppVM: HomeAppViewModel) {
@@ -102,19 +117,91 @@ fun DevicesView (homeAppVM: HomeAppViewModel) {
             }
         }
 
-
+        CameraPreviewAndBlinkDetection(homeAppVM)
     }
+}
+@Composable
+fun CameraPreviewAndBlinkDetection(homeAppVM: HomeAppViewModel) {
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val previewView = remember { PreviewView(context) }
+    val scope = rememberCoroutineScope()
+    val selectedDeviceVM: DeviceViewModel? = homeAppVM.selectedDeviceVM.collectAsState().value // Get the selected device
+
+    var blinkDetectionHelper: BlinkDetectionHelper? = null
+
+    DisposableEffect(lifecycleOwner) {
+        blinkDetectionHelper = BlinkDetectionHelper(context, previewView) {
+            scope.launch(Dispatchers.Main) {
+                selectedDeviceVM?.let { deviceVM ->
+                    val traits: List<Trait> by deviceVM.traits.collectAsState()
+                    val isConnected: Boolean = (deviceVM.connectivity == ConnectivityState.ONLINE)
+                    val onOffTrait = traits.find { it is OnOff } as? OnOff
+                    if (onOffTrait != null && isConnected) {
+                        val currentState = onOffTrait.onOff ?: false
+                        if (currentState) {
+                            onOffTrait.off()
+                            deviceVM.status.emit("Off")
+                        } else {
+                            onOffTrait.on()
+                            deviceVM.status.emit("On")
+                        }
+                    }
+                }
+            }
+        }
+        blinkDetectionHelper?.startCamera(lifecycleOwner)
+        onDispose {
+            blinkDetectionHelper?.shutdownCameraExecutor()
+        }
+    }
+
+    AndroidView(
+        factory = {
+            previewView.apply {
+                layoutParams = ViewGroup.LayoutParams(150, 150)
+                scaleType = PreviewView.ScaleType.FILL_CENTER
+                visibility = android.view.View.VISIBLE
+            }
+        }
+    )
 }
 
 @Composable
 fun DeviceListItem (deviceVM: DeviceViewModel, homeAppVM: HomeAppViewModel) {
     val scope: CoroutineScope = rememberCoroutineScope()
     val deviceStatus: String = deviceVM.status.collectAsState().value
+    val traits: List<Trait> by deviceVM.traits.collectAsState()
+    val isConnected: Boolean = (deviceVM.connectivity == ConnectivityState.ONLINE)
 
-    Column (Modifier.padding(horizontal = 24.dp, vertical = 8.dp).fillMaxWidth()
-        .clickable { scope.launch { homeAppVM.selectedDeviceVM.emit(deviceVM) } }) {
+
+    Column (Modifier
+        .padding(horizontal = 24.dp, vertical = 8.dp)
+        .fillMaxWidth()
+
+    ) {
         Text(deviceVM.name, fontSize = 20.sp)
         Text(deviceStatus, fontSize = 16.sp)
+        val onOffTrait = traits.find { it is OnOff } as? OnOff
+        if (onOffTrait != null) {
+            Switch(
+                checked = onOffTrait.onOff==true,
+                onCheckedChange = { isChecked ->
+                    scope.launch {
+                        if (isConnected) {
+                            if (isChecked) {
+                                onOffTrait.on()
+                            } else {
+                                onOffTrait.off()
+                            }
+                            deviceVM.status.emit(if(isChecked) "On" else "Off")
+                        }
+                    }
+                },
+                enabled = isConnected
+            )
+        }
+
     }
 }
 
@@ -134,8 +221,8 @@ fun DeviceListComponent (homeAppVM: HomeAppViewModel) {
     val selectedRoomVMs: List<RoomViewModel> =
         selectedStructureVM.roomVMs.collectAsState().value
 
-    val selectedDeviceVMsWithoutRooms: List<DeviceViewModel> =
-        selectedStructureVM.deviceVMsWithoutRooms.collectAsState().value
+//    val selectedDeviceVMsWithoutRooms: List<DeviceViewModel> =
+//        selectedStructureVM.deviceVMsWithoutRooms.collectAsState().value
 
 
     for (roomVM in selectedRoomVMs) {
@@ -148,17 +235,17 @@ fun DeviceListComponent (homeAppVM: HomeAppViewModel) {
         }
     }
 
-    if (selectedDeviceVMsWithoutRooms.isNotEmpty()) {
-
-        Column (Modifier.padding(horizontal = 16.dp, vertical = 8.dp).fillMaxWidth()) {
-            Text("Not in a room", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-        }
-
-        for (deviceVM in selectedDeviceVMsWithoutRooms) {
-            DeviceListItem(deviceVM, homeAppVM)
-        }
-
-    }
+//    if (selectedDeviceVMsWithoutRooms.isNotEmpty()) {
+//
+//        Column (Modifier.padding(horizontal = 16.dp, vertical = 8.dp).fillMaxWidth()) {
+//            Text("Not in a room", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+//        }
+//
+//        for (deviceVM in selectedDeviceVMsWithoutRooms) {
+//            DeviceListItem(deviceVM, homeAppVM)
+//        }
+//
+//    }
 
 }
 

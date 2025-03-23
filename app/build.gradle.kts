@@ -54,4 +54,12 @@ dependencies {
 //    implementation("com.google.android.gms:play-services-location:21.3.0")
 //    implementation("com.google.android.gms:play-services-home:16.0.0")
 //    implementation("com.google.apis:google-api-services-homegraph:v1-rev20230720-2.0.0")
+//    def camerax_version = "1.3.1"
+    implementation("androidx.camera:camera-core:1.3.1")
+    implementation("androidx.camera:camera-camera2:1.3.1")
+    implementation("androidx.camera:camera-lifecycle:1.3.1")
+    implementation("androidx.camera:camera-view:1.3.1")
+    implementation("androidx.camera:camera-extensions:1.3.1")
+    implementation("com.google.mlkit:face-detection:16.1.5")
+
 }

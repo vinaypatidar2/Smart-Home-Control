@@ -102,23 +102,7 @@ fun ControlListItem (trait: Trait, isConnected: Boolean, type: DeviceType) {
                     enabled = isConnected
                 )
             }
-            is LevelControl -> {
-                val level = trait.currentLevel
-                Text(trait.factory.toString(), fontSize = 20.sp)
-                LevelSlider(value = level?.toFloat()!!, low = 0f, high = 254f, steps = 0,
-                    modifier = Modifier.padding(top = 16.dp),
-                    onValueChange = { value : Float ->
-                        scope.launch {
-                            trait.moveToLevelWithOnOff(
-                                level = value.toInt().toUByte(),
-                                transitionTime = null,
-                                optionsMask = LevelControlTrait.OptionsBitmap(),
-                                optionsOverride = LevelControlTrait.OptionsBitmap()
-                            ) }
-                    },
-                    isEnabled = isConnected
-                )
-            }
+
 
 
 
