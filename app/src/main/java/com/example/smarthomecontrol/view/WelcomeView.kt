@@ -46,7 +46,7 @@ fun WelcomeView (homeAppVM: HomeAppViewModel) {
         Spacer(Modifier.height(32.dp))
 
         Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            Text(stringResource(R.string.welcome_text_3), fontSize = 24.sp, textAlign = TextAlign.Center)
+            Text(stringResource(R.string.app_name), fontSize = 24.sp, textAlign = TextAlign.Center)
         }
 
 //        Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
@@ -62,7 +62,7 @@ fun WelcomeView (homeAppVM: HomeAppViewModel) {
         Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
             // Sign-in button to trigger Permissions API and start the sign-in flow:
             Button(onClick = { homeAppVM.homeApp.permissionsManager.requestPermissions() }) {
-                Text(stringResource(R.string.app_name))
+                Text(stringResource(R.string.welcome_text_3))
             }
         }
     }
