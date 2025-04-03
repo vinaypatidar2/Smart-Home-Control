@@ -1168,26 +1168,7 @@ fun DevicesView(homeAppVM: HomeAppViewModel) {
     Column(modifier = Modifier.fillMaxHeight()) {
         DevicesTopBar("", listOf { DevicesAccountButton(homeAppVM) })
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            val backgroundColor = if (isBackButtonHighlighted) MaterialTheme.colorScheme.primaryContainer else Color.Transparent
-            IconButton(
-                onClick = { Log.d("Button", "Button") },
-                modifier = Modifier.background(backgroundColor)
-            ) {
-                Icon(Icons.Default.KeyboardArrowLeft, "Back")
-            }
-            Text(
-                "Back",
-                fontSize = 20.sp,
-                modifier = Modifier.padding(start = 8.dp)
-            )
-        }
+
 
         Box(modifier = Modifier.weight(1f)) {
             Column {
@@ -1266,7 +1247,34 @@ fun DevicesView(homeAppVM: HomeAppViewModel) {
 
 
                 }
+
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val backgroundColor = if (isBackButtonHighlighted) MaterialTheme.colorScheme.primaryContainer else Color.Transparent
+                    IconButton(
+                        onClick = { Log.d("Button", "Button") },
+                        modifier = Modifier.background(backgroundColor)
+                    ) {
+                        Icon(Icons.Default.KeyboardArrowLeft, "Back")
+                    }
+                    Text(
+                        "Back",
+                        fontSize = 20.sp,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+
+
+
                 // Blink Detection Column
+
+
                 Column(
                     modifier = Modifier
                         .weight(0.3f)
