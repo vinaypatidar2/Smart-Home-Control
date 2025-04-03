@@ -1231,33 +1231,30 @@ fun DevicesView(homeAppVM: HomeAppViewModel) {
                                 deviceVMs = deviceVMsInRoom,
                                 highlightedIndex = highlightedIndex
                             )
-                        } else {
-                            Text(
-                                stringResource(R.string.devices_select_room_prompt),
-                                modifier = Modifier.align(Alignment.CenterHorizontally).padding(16.dp)
-                            )
                         }
                     }
 
-                    // Blink Detection Column
-                    Column(
-                        modifier = Modifier
-                            .weight(0.3f)
-                            .padding(start = 8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        if (selectedRoom != null && deviceVMsInRoom.isNotEmpty()) {
-                            BlinkDetectionComponent(
-                                deviceVMsInRoom = deviceVMsInRoom,
-                                onHighlightIndexChange = { newIndex ->
-                                    highlightedIndex = newIndex
-                                },
-                                onDeviceSelectedByBlink = { selectedDevice ->
-                                    // The actual toggle logic will be handled with debouncing
-                                    handleBlinkToggle(selectedDevice, scope, context)
-                                }
-                            )
-                        }
+
+
+                }
+                // Blink Detection Column
+                Column(
+                    modifier = Modifier
+                        .weight(0.3f)
+                        .padding(start = 8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (selectedRoom != null && deviceVMsInRoom.isNotEmpty()) {
+                        BlinkDetectionComponent(
+                            deviceVMsInRoom = deviceVMsInRoom,
+                            onHighlightIndexChange = { newIndex ->
+                                highlightedIndex = newIndex
+                            },
+                            onDeviceSelectedByBlink = { selectedDevice ->
+                                // The actual toggle logic will be handled with debouncing
+                                handleBlinkToggle(selectedDevice, scope, context)
+                            }
+                        )
                     }
                 }
             }
@@ -1355,7 +1352,7 @@ fun BlinkDetectionComponent(
 
     var sequenceHighlightIndex by remember { mutableStateOf(-1) }
 
-    val highlightDuration = 1500L
+    val highlightDuration = 3000L
     val initialDelay = 500L
 
     LaunchedEffect(deviceVMsInRoom) {
