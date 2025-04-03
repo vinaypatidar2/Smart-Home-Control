@@ -38,6 +38,7 @@ public class BlinkDetectionHelper {
     private Handler handler = new Handler();
     private Context context;
     private BlinkListener blinkListener;
+    private static final int BLINK_COOLDOWN_TIME = 1000; // Reduced cooldown to 1 second
 
     public interface BlinkListener {
         void onBlinkDetected();
@@ -114,7 +115,7 @@ public class BlinkDetectionHelper {
                                         handler.post(() -> performBlinkAction());
                                         Log.d("BlinkDetect", "Blink detected!");
                                         blinkCooldown = true;
-                                        handler.postDelayed(() -> blinkCooldown = false, 2000);
+                                        handler.postDelayed(() -> blinkCooldown = false, BLINK_COOLDOWN_TIME);
                                     }
                                 } else {
                                     blinkDetected = false;
