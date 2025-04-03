@@ -49,6 +49,8 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
     implementation("androidx.compose.material3:material3:1.1.2")
+//    implementation("androidx.compose.material:material-icons-extended:1.6.0") // Or the latest version
+//    implementation("androidx.navigation:navigation-compose:2.7.7") // Or the latest stable version
     // Home API SDK dependency:
     implementation(libs.play.services.home)
 //    implementation("com.google.android.gms:play-services-location:21.3.0")

@@ -1043,6 +1043,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+
+import androidx.navigation.NavController
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -1157,8 +1160,34 @@ fun DevicesView(homeAppVM: HomeAppViewModel) {
 
     val deviceVMsInRoom: List<DeviceViewModel> by selectedRoom?.deviceVMs?.collectAsState() ?: remember { mutableStateOf(emptyList()) }
 
+
+    var isBackButtonHighlighted by remember { mutableStateOf(false) }
+    val backButtonIndex = deviceVMsInRoom.size // Last index for back button
+
+
     Column(modifier = Modifier.fillMaxHeight()) {
         DevicesTopBar("", listOf { DevicesAccountButton(homeAppVM) })
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            val backgroundColor = if (isBackButtonHighlighted) MaterialTheme.colorScheme.primaryContainer else Color.Transparent
+            IconButton(
+                onClick = { Log.d("Button", "Button") },
+                modifier = Modifier.background(backgroundColor)
+            ) {
+                Icon(Icons.Default.KeyboardArrowLeft, "Back")
+            }
+            Text(
+                "Back",
+                fontSize = 20.sp,
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
 
         Box(modifier = Modifier.weight(1f)) {
             Column {
@@ -1244,16 +1273,22 @@ fun DevicesView(homeAppVM: HomeAppViewModel) {
                         .padding(start = 8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if (selectedRoom != null && deviceVMsInRoom.isNotEmpty()) {
+                    if (selectedRoom != null) {
                         BlinkDetectionComponent(
                             deviceVMsInRoom = deviceVMsInRoom,
                             onHighlightIndexChange = { newIndex ->
                                 highlightedIndex = newIndex
+                                isBackButtonHighlighted = newIndex == backButtonIndex
                             },
                             onDeviceSelectedByBlink = { selectedDevice ->
-                                // The actual toggle logic will be handled with debouncing
-                                handleBlinkToggle(selectedDevice, scope, context)
-                            }
+                                if (highlightedIndex == backButtonIndex) {
+//                                    navController.popBackStack()
+                                    Toast.makeText(context, "Back Action", Toast.LENGTH_SHORT).show()
+                                } else if (selectedDevice is DeviceViewModel) {
+                                    handleBlinkToggle(selectedDevice, scope, context)
+                                }
+                            },
+                            totalItems = deviceVMsInRoom.size + 1 // +1 for the back button
                         )
                     }
                 }
@@ -1344,7 +1379,8 @@ fun DeviceListItem(
 fun BlinkDetectionComponent(
     deviceVMsInRoom: List<DeviceViewModel>,
     onHighlightIndexChange: (Int) -> Unit,
-    onDeviceSelectedByBlink: (DeviceViewModel) -> Unit
+    onDeviceSelectedByBlink: (Any) -> Unit,
+    totalItems: Int // Total number of items to iterate through (devices + back button)
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -1355,8 +1391,8 @@ fun BlinkDetectionComponent(
     val highlightDuration = 3000L
     val initialDelay = 500L
 
-    LaunchedEffect(deviceVMsInRoom) {
-        if (deviceVMsInRoom.isEmpty()) {
+    LaunchedEffect(deviceVMsInRoom, totalItems) {
+        if (totalItems == 0) {
             sequenceHighlightIndex = -1
             onHighlightIndexChange(-1)
             return@LaunchedEffect
@@ -1370,11 +1406,11 @@ fun BlinkDetectionComponent(
         while (true) {
             sequenceHighlightIndex = currentIndex
             onHighlightIndexChange(currentIndex)
-            Log.d("HighlightSeq", "Highlighting index $currentIndex: ${deviceVMsInRoom[currentIndex].name}")
+            Log.d("HighlightSeq", "Highlighting index $currentIndex")
 
             delay(highlightDuration)
 
-            currentIndex = (currentIndex + 1) % deviceVMsInRoom.size
+            currentIndex = (currentIndex + 1) % totalItems
         }
     }
 
@@ -1382,11 +1418,14 @@ fun BlinkDetectionComponent(
         BlinkDetectionHelper(context, previewView, object : BlinkDetectionHelper.BlinkListener {
             override fun onBlinkDetected() {
                 val currentlyHighlightedDeviceIndex = sequenceHighlightIndex
-                if (currentlyHighlightedDeviceIndex in deviceVMsInRoom.indices) {
-                    val selectedDevice = deviceVMsInRoom[currentlyHighlightedDeviceIndex]
-                    onDeviceSelectedByBlink(selectedDevice)
+                if (currentlyHighlightedDeviceIndex in 0 until totalItems) {
+                    if (currentlyHighlightedDeviceIndex < deviceVMsInRoom.size) {
+                        onDeviceSelectedByBlink(deviceVMsInRoom[currentlyHighlightedDeviceIndex])
+                    } else {
+                        onDeviceSelectedByBlink(Any()) // Placeholder for back action
+                    }
                 } else {
-                    Log.d("BlinkDetection", "Blink detected, but no device was highlighted in sequence.")
+                    Log.d("BlinkDetection", "Blink detected, but no item was highlighted in sequence.")
                 }
             }
         })
@@ -1411,6 +1450,9 @@ fun BlinkDetectionComponent(
         }
     }
 }
+
+
+
 
 // --- Debouncing Logic for Blink Toggle ---
 private var lastToggleTime = 0L
