@@ -65,5 +65,8 @@
     <string name="automation_text_is_active">isActive</string>
     <string name="automation_button_execute">Manually Execute</string>
     <string name="automation_button_delete">Delete Automation</string>
+    <string name="devices_select_room">Select Room</string>
+    <string name="devices_select_room_prompt">Please select a room to view devices.</string>
+    <string name="devices_no_devices">No devices found in this room.</string>
 
 </resources>
