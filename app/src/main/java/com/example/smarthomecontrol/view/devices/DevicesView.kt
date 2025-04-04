@@ -997,11 +997,17 @@
 
 
 
-
+/**
+ *  WORKING CODE OR MAIN CODE STARTS HERE
+ *
+ *
+ * */
 
 package com.example.smarthomecontrol.view.devices
 
 import android.content.Context
+import android.app.Activity
+import androidx.activity.ComponentActivity
 import android.util.Log
 import android.widget.Toast
 import androidx.camera.view.PreviewView
@@ -1044,8 +1050,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
-
-import androidx.navigation.NavController
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -1062,6 +1066,9 @@ import com.google.home.matter.standard.OnOff
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import androidx.compose.ui.semantics.Role
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.alpha
 
 // --- Helper Composables (Mostly Unchanged) ---
 
@@ -1126,21 +1133,15 @@ fun DevicesView(homeAppVM: HomeAppViewModel) {
     var expandedStructure: Boolean by remember { mutableStateOf(false) }
     var expandedRoom: Boolean by remember { mutableStateOf(false) }
 
-    val cachedStructureVMs = remember { mutableStateOf<List<StructureViewModel>?>(null) }
-    val structureVMs: List<StructureViewModel> by homeAppVM.structureVMs.collectAsState(initial = cachedStructureVMs.value ?: emptyList())
-    LaunchedEffect(structureVMs) {
-        cachedStructureVMs.value = structureVMs
-    }
+    val structureVMs: List<StructureViewModel> by homeAppVM.structureVMs.collectAsState()
+
 
     val selectedStructureVM: StructureViewModel? by homeAppVM.selectedStructureVM.collectAsState()
     val structureName: String =
         selectedStructureVM?.name ?: stringResource(R.string.devices_structure_loading)
 
-    val cachedRoomVMs = remember(selectedStructureVM) { mutableStateOf<List<RoomViewModel>?>(null) }
-    val roomVMs: List<RoomViewModel> by selectedStructureVM?.roomVMs?.collectAsState(initial = cachedRoomVMs.value ?: emptyList()) ?: remember { mutableStateOf(emptyList()) }
-    LaunchedEffect(roomVMs) {
-        cachedRoomVMs.value = roomVMs
-    }
+    val roomVMs: List<RoomViewModel> by selectedStructureVM?.roomVMs?.collectAsState() ?: remember { mutableStateOf(emptyList()) }
+
 
     var selectedRoom: RoomViewModel? by remember(selectedStructureVM) {
         mutableStateOf(roomVMs.firstOrNull())
@@ -1249,24 +1250,33 @@ fun DevicesView(homeAppVM: HomeAppViewModel) {
                 }
 
 
+
+
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(horizontal = 8.dp)
+                        .background(
+                            color = if (isBackButtonHighlighted) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
+                            shape = MaterialTheme.shapes.medium
+                        )
+                        .clickable(
+                            onClick = { callPatientApp(context) },
+                            role = Role.Button // Accessibility: Treat this Row as a button
+                        )
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+
                 ) {
-                    val backgroundColor = if (isBackButtonHighlighted) MaterialTheme.colorScheme.primaryContainer else Color.Transparent
-                    IconButton(
-                        onClick = { Log.d("Button", "Button") },
-                        modifier = Modifier.background(backgroundColor)
-                    ) {
-                        Icon(Icons.Default.KeyboardArrowLeft, "Back")
-                    }
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowLeft,
+                        contentDescription = "Back"
+                    )
+
                     Text(
-                        "Back",
+                        text = "Back",
                         fontSize = 20.sp,
-                        modifier = Modifier.padding(start = 8.dp)
+
                     )
                 }
 
@@ -1290,8 +1300,7 @@ fun DevicesView(homeAppVM: HomeAppViewModel) {
                             },
                             onDeviceSelectedByBlink = { selectedDevice ->
                                 if (highlightedIndex == backButtonIndex) {
-//                                    navController.popBackStack()
-                                    Toast.makeText(context, "Back Action", Toast.LENGTH_SHORT).show()
+                                   callPatientApp(context)
                                 } else if (selectedDevice is DeviceViewModel) {
                                     handleBlinkToggle(selectedDevice, scope, context)
                                 }
@@ -1329,7 +1338,9 @@ fun DeviceListComponent(
     }
 }
 
-// --- Device List Item (Unchanged logic, receives isHighlighted) ---
+// --- Device List Item
+
+
 
 @Composable
 fun DeviceListItem(
@@ -1348,7 +1359,7 @@ fun DeviceListItem(
         Modifier
             .padding(horizontal = 24.dp, vertical = 8.dp)
             .fillMaxWidth()
-            .background(backgroundColor)
+            .background(color = backgroundColor, shape = MaterialTheme.shapes.medium)
     ) {
         Text(deviceVM.name, fontSize = 20.sp)
         Text(deviceStatus, fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -1368,7 +1379,6 @@ fun DeviceListItem(
                                 }
                             } catch (e: Exception) {
                                 Log.e("DeviceControl", "Failed to toggle ${deviceVM.name}", e)
-                                // Consider showing a user-friendly error message here
                             }
                         }
                     }
@@ -1376,7 +1386,6 @@ fun DeviceListItem(
                 enabled = isConnected
             )
         }
-        // Add more trait controls here if needed (e.g., brightness sliders)
     }
 }
 
@@ -1442,8 +1451,10 @@ fun BlinkDetectionComponent(
     AndroidView(
         factory = { previewView },
         modifier = Modifier
+            .alpha(0f)
             .size(120.dp)
             .background(Color.DarkGray)
+
     )
 
     LaunchedEffect(lifecycleOwner) {
@@ -1510,5 +1521,18 @@ private fun handleDeviceToggleOnBlink(
     } else {
         Log.w("BlinkSelection", "Device ${device.name} has no OnOff trait to toggle.")
 //        Toast.makeText(context, "${device.name} cannot be toggled.", Toast.LENGTH_SHORT).show()
+    }
+}
+
+
+fun callPatientApp(context: Context){
+    val activity = context as? Activity
+    if (activity != null) {
+        Log.d("BackAction", "Triggering default back press via OnBackPressedDispatcher.")
+        activity.finish()
+    } else {
+        // Fallback if the context is not an Activity
+        Log.e("BackAction", "Context could not be cast to Activity. Cannot trigger back press.")
+        Toast.makeText(context, "Error performing back action", Toast.LENGTH_SHORT).show()
     }
 }
