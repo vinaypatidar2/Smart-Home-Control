@@ -1,15 +1,18 @@
 package com.example.smarthomecontrol
 
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.smarthomecontrol.view.HomeAppView
 import com.example.smarthomecontrol.viewmodel.HomeAppViewModel
-
+import android.Manifest
 class MainActivity : ComponentActivity() {
 
     private lateinit var homeApp: HomeApp
@@ -25,6 +28,9 @@ class MainActivity : ComponentActivity() {
         // Initialize the viewmodel representing the main app:
         homeAppVM = HomeAppViewModel(homeApp)
 
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_REQUEST_CODE)
+        }
         // Call to make the app allocate the entire screen:
         enableEdgeToEdge()
         // Set the content of the screen to display the app:
@@ -32,14 +38,19 @@ class MainActivity : ComponentActivity() {
     }
 
 
+
+
     companion object {
         private lateinit var logger: Logger
+        private const val CAMERA_PERMISSION_REQUEST_CODE = 123
         // Exposed utility functions for logging and displaying messages:
         fun showError(caller: Any, message: String) { logger.log(caller, message, Logger.LogLevel.ERROR) }
         fun showWarning(caller: Any, message: String) { logger.log(caller, message, Logger.LogLevel.WARNING) }
         fun showInfo(caller: Any, message: String) { logger.log(caller, message, Logger.LogLevel.INFO) }
         fun showDebug(caller: Any, message: String) { logger.log(caller, message, Logger.LogLevel.DEBUG) }
     }
+
+
 }
 
 /*  Logger - Utility class for logging and displaying messages
